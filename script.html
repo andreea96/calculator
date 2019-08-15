@@ -69,14 +69,14 @@
 
             }
             else {
-		nrPieces = parseInt(lengthValue/maxValue); //these are the same length pieces
+		nrPieces = parseInt(lengthValue/maxValue) + 1; //these are the same length pieces
 		nrHolesNeeded = nrPieces+2-1;
 		leftPieceLength = lengthValue-lengthValue/(nrPieces+1);
-		document.getElementById("result").innerHTML=nrPieces + ' bucati de lungime ' + lengthValue/(nrPieces+1) +'<br /> 1 bucata de lungime '+leftPieceLength+'<br />2 bucati de 50 <br />'+ nrHolesNeeded + ' gauri'
-              +'<br />';	
+		document.getElementById("result").innerHTML=nrPieces + ' bucati de lungime ' + lengthValue/(nrPieces) 
+				+'<br />2 bucati de 50 <br />'+ nrHolesNeeded + ' gauri';
 		}
 			
-//document.getElementById("result").innerHTML = 'no value found';
+       //document.getElementById("result").innerHTML = 'no value found';
         }
 
   }
