@@ -16,13 +16,6 @@
 
 <script>
   function validate(event){
-    //
-     console.log(event.srcElement);
-    // if(Number.isInteger(self.value))
-    //   calculateResult();
-    //   else self.value = 0;
-
-
       var keycode = (event.which) ? event.which : event.keyCode;
           //comparing pressed keycodes
           var currentValue = event.srcElement.value;
@@ -37,10 +30,7 @@
               alert(" You can enter only characters 0 to 9 ");
               return false;
           }
-
-
          return true;
-
   }
 
   function calculateResult(){

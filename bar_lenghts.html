@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Optimum cuts</title>
+</head>
+<body>
+<script>
+    var inputs = 0;
+    function validate(event){
+        var keycode = (event.which) ? event.which : event.keyCode;
+        //comparing pressed keycodes
+        var currentValue = event.srcElement.value;
+
+        // //check if key code backslash or delete
+        // if(currentValue.length==1 && (keycode==8 || keycode==46 )){
+        //   currentValue=0;
+        //   return false;
+        // }
+
+        if (keycode > 31 && ((keycode < 48 || keycode > 57 ) && (keycode < 96 || keycode > 105))) {
+            alert(" You can enter only characters 0 to 9 ");
+            return false;
+        }
+        return true;
+    }
+
+    function calculateResult(){
+        var minValue = document.getElementsByName('min')[0].value;
+        var maxValue = document.getElementsByName('max')[0].value;
+        var lengthValue = document.getElementsByName('length')[0].value-100;
+        var nrPieces = 0;
+        var pieceLength = 0;
+        var nrHolesNeeded = 0;
+        if(minValue == '' || maxValue=='' || lengthValue=='')
+            document.getElementById("result").innerHTML="wee need more info";
+        else {
+            for(i=parseInt(maxValue);i>=parseInt(minValue);i--)
+            {
+                if(lengthValue%i==0){
+                    nrPieces = lengthValue/i;
+                    pieceLength = i;
+                    nrHolesNeeded = nrPieces+2-1;
+                    break;
+                }
+            }
+            if(nrPieces!=0)
+            {
+                document.getElementById("result").innerHTML=nrPieces + ' bucati de lungime ' + pieceLength+'<br />2 bucati de 50 <br />'+ nrHolesNeeded + ' gauri'
+                    +'<br />';
+
+            }
+            else {
+                nrPieces = parseInt(lengthValue/maxValue) + 1; //these are the same length pieces
+                nrHolesNeeded = nrPieces+2-1;
+                leftPieceLength = lengthValue-lengthValue/(nrPieces+1);
+                document.getElementById("result").innerHTML=nrPieces + ' bucati de lungime ' + lengthValue/(nrPieces)
+                    +'<br />2 bucati de 50 <br />'+ nrHolesNeeded + ' gauri';
+            }
+            //document.getElementById("result").innerHTML = 'no value found';
+        }
+    }
+
+    function addInput() {
+        inputs++;
+        var className = `input_${inputs}`;
+        var pieceInput = `<input class="${className}" type="text" onkeydown="return validate(event, this)" name="pieceNr"/><hr> `;
+        document.getElementById('pieces').append("<b>ceva</b>");
+    }
+
+</script>
+<label for="length">Lungime bara</label>
+<input name="length" type="text" onkeydown="return validate(event,this)" onkeyup="calculateResult()" />
+<button onclick="addInput()">Adauga bucati dorite</button>
+<br />
+<hr>
+<div id="pieces">
+
+</div>
+</body>
+</html>
