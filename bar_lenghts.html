@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Optimum cuts</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 </head>
+<style>
+    hr.result{
+        border: 1px solid #775c6a;
+        margin-right: 70%;
+    }
+</style>
 <body>
 <script>
+    const CLASS_NAME_NO= 'no_input_';
+    const CLASS_NAME_LENGTH= 'length_input_';
+    const BAR_LENGTH= 'bar_length';
+    const BAR_CUT_WASTE = 8;
     var inputs = 0;
     function validate(event){
         var keycode = (event.which) ? event.which : event.keyCode;
-        //comparing pressed keycodes
-        var currentValue = event.srcElement.value;
-
-        // //check if key code backslash or delete
-        // if(currentValue.length==1 && (keycode==8 || keycode==46 )){
-        //   currentValue=0;
-        //   return false;
-        // }
 
         if (keycode > 31 && ((keycode < 48 || keycode > 57 ) && (keycode < 96 || keycode > 105))) {
             alert(" You can enter only characters 0 to 9 ");
@@ -26,55 +29,100 @@
     }
 
     function calculateResult(){
-        var minValue = document.getElementsByName('min')[0].value;
-        var maxValue = document.getElementsByName('max')[0].value;
-        var lengthValue = document.getElementsByName('length')[0].value-100;
-        var nrPieces = 0;
-        var pieceLength = 0;
-        var nrHolesNeeded = 0;
-        if(minValue == '' || maxValue=='' || lengthValue=='')
-            document.getElementById("result").innerHTML="wee need more info";
-        else {
-            for(i=parseInt(maxValue);i>=parseInt(minValue);i--)
-            {
-                if(lengthValue%i==0){
-                    nrPieces = lengthValue/i;
-                    pieceLength = i;
-                    nrHolesNeeded = nrPieces+2-1;
-                    break;
-                }
+        let lengthsArr = [];
+        //recreate array with all the lengths
+        const barLength = parseInt($(`.${BAR_LENGTH}`)[0].value);
+        for(var i=1; i<=inputs; i++) {
+            let length = parseInt($(`.${CLASS_NAME_LENGTH}${i}`)[0].value);
+            let noLengths = parseInt($(`.${CLASS_NAME_NO}${i}`)[0].value);
+            if(!isNaN(noLengths) && !isNaN(length)){
+                lengthsArr.push({length, noLengths});
             }
-            if(nrPieces!=0)
-            {
-                document.getElementById("result").innerHTML=nrPieces + ' bucati de lungime ' + pieceLength+'<br />2 bucati de 50 <br />'+ nrHolesNeeded + ' gauri'
-                    +'<br />';
-
-            }
-            else {
-                nrPieces = parseInt(lengthValue/maxValue) + 1; //these are the same length pieces
-                nrHolesNeeded = nrPieces+2-1;
-                leftPieceLength = lengthValue-lengthValue/(nrPieces+1);
-                document.getElementById("result").innerHTML=nrPieces + ' bucati de lungime ' + lengthValue/(nrPieces)
-                    +'<br />2 bucati de 50 <br />'+ nrHolesNeeded + ' gauri';
-            }
-            //document.getElementById("result").innerHTML = 'no value found';
         }
+        lengthsArr = lengthsArr.sort((item1, item2) => {
+            return -(item1.length - item2.length)
+        });
+        let noBars = 0;
+        let results = [];
+        while(lengthsArr.length !== 0) {
+            noBars++;
+            let barRest = barLength;
+            let barResultingPieces = [];
+            lengthsArr.forEach(({length, noLengths}, index) => {
+                let cutsMade = 0;
+                let potentialCuts = parseInt(barRest/(length+BAR_CUT_WASTE));
+                potentialCuts = potentialCuts <= noLengths
+                    ? potentialCuts
+                    : noLengths;
+                barRest-=potentialCuts*(length+BAR_CUT_WASTE);
+                lengthsArr[index].noLengths -= potentialCuts;
+                cutsMade = potentialCuts;
+                if((potentialCuts < noLengths)   //poate mai putem adauga o bucata in plus eliminand ultima portiune de 8 mm
+                    &&(barRest - length) >= 0 ) {
+                      barRest -=length;
+                      lengthsArr[index].noLengths--;
+                      cutsMade++;
+                }
+                if(cutsMade > 0 ) {
+                    barResultingPieces.push({
+                        nrPieces: cutsMade,
+                        lengthPieces: length
+                    });
+                }
+            }, lengthsArr)
+            results.push({barRest, barResultingPieces});
+            lengthsArr = lengthsArr.filter((value, index, array) => {
+                return (value.noLengths !== 0);
+            });
+        }
+        showResults(results, barLength);
+    }
+
+    function showResults(resultsArray, barLength) {
+        let text = `Bari de ${barLength} necesare: <b>${resultsArray.length}</b> <br />`;
+        $('#results').empty().append(text);
+        text = ``;
+        resultsArray.forEach((resultItem, index) => {
+            text +=`<hr class="result">`
+            text+= `Bara ${index+1}:<ul>`;
+            resultItem.barResultingPieces.forEach(({nrPieces, lengthPieces}) => {
+                let type = nrPieces === 1 ? `bucata` : `bucati`;
+                text+= `<li>${nrPieces} ${type} de ${lengthPieces} mm</li>`;
+            });
+            text+=`</ul>`;
+            text+=`Ramas din bara: ${resultItem.barRest} <br />`;
+        });
+
+        $('#results').append(text);
     }
 
     function addInput() {
         inputs++;
-        var className = `input_${inputs}`;
-        var pieceInput = `<input class="${className}" type="text" onkeydown="return validate(event, this)" name="pieceNr"/><hr> `;
-        document.getElementById('pieces').append("<b>ceva</b>");
+        var classNameNo = `${CLASS_NAME_NO}${inputs}`;
+        var classNameLength = `${CLASS_NAME_LENGTH}${inputs}`;
+        var pieceInput =
+            `<input class="${classNameNo}" type="text" onkeydown="return validate(event, this)" name="pieceNr"/>
+                bucati de
+                <input class="${classNameLength}" type="text" onkeydown="return validate(event, this)" name="pieceLength"/> mm
+            <hr> `;
+        $("#pieces").append(pieceInput);
     }
 
 </script>
 <label for="length">Lungime bara</label>
-<input name="length" type="text" onkeydown="return validate(event,this)" onkeyup="calculateResult()" />
-<button onclick="addInput()">Adauga bucati dorite</button>
+<input class="bar_length"   type="text" onkeydown="return validate(event,this)"  /> mm
+<br /> <br />
+<i>*Nota: </i> Lamele taie 8 mm din teava
 <br />
 <hr>
 <div id="pieces">
+
+</div>
+<button onclick="calculateResult()">Calculeaza rezultat</button> &nbsp; &nbsp;
+<button onclick="addInput()">Adauga bucati dorite</button>
+
+<br />
+<div id="results">
 
 </div>
 </body>
