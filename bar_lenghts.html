@@ -10,7 +10,73 @@
         border: 1px solid #775c6a;
         margin-right: 70%;
     }
+    input.graphics{
+        height: 24px;
+        width: 60px;
+    }
+    .barType {
+        margin-left: 30%;
+    }
+
+    .top-buffer { margin-top: 10px; }
+    /*
+     BAR VISUALS
+    */
+    div.d90{
+        background-color: #ccc;
+        border: 5px solid #ccc;
+        height: 24px;
+        position: relative;
+        width: 100%;
+    }
+
+    div.d135l{
+        content: '45';
+        position: absolute;
+        border: 12px solid #ccc;
+        top: -5px;
+        left: -5px;
+        /*border-top: white;*/
+        /*border-right: transparent;*/
+        /*border-bottom: transparent;*/
+        /*border-left: white;*/
+        border-color: white transparent transparent white;
+    }
+
+    div.d135r{
+        content: '45';
+        position: absolute;
+        right: -5px;
+        top: -5px;
+        border: 12px solid #ccc;
+        /*border-color: #ccc transparent white transparent;*/
+        border-right-color: white;
+        border-top-color: white;
+        border-bottom-color: transparent;
+    }
+
+    div.d45l {
+        position: absolute;
+        /*height: 15px;*/
+        border: 12px solid #ccc;
+        top: -5px;
+        left: -5px;
+        border-color: transparent transparent white white;
+    }
+
+    div.d45r{
+        content: '45';
+        position: absolute;
+        right: -5px;
+        top: -5px;
+        border: 12px solid #ccc;
+        /*border-color: #ccc transparent white transparent;*/
+        border-right-color: white;
+        border-top-color: #ccc;
+        border-bottom-color: white;
+    }
 </style>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 <body>
 <script>
     const CLASS_NAME_NO= 'no_input_';
@@ -18,6 +84,8 @@
     const BAR_LENGTH= 'bar_length';
     const BAR_CUT_WASTE = 8;
     var inputs = 0;
+    var globalLengths = [];
+
     function validate(event){
         var keycode = (event.which) ? event.which : event.keyCode;
 
@@ -42,6 +110,7 @@
         lengthsArr = lengthsArr.sort((item1, item2) => {
             return -(item1.length - item2.length)
         });
+        globalLengths = lengthsArr;
         let noBars = 0;
         let results = [];
         while(lengthsArr.length !== 0) {
@@ -76,6 +145,7 @@
             });
         }
         showResults(results, barLength);
+        globalResults = results;
     }
 
     function showResults(resultsArray, barLength) {
@@ -96,6 +166,37 @@
         $('#results').append(text);
     }
 
+    function getGraphicsBar(leftD = 45, rightD = 45) {
+        let barDiv = `<div class="d90 col-8">${leftD}`;
+        if([45, 135].includes(leftD)) {
+            barDiv+= ` <div class="d${leftD}l"></div>`;
+        }
+        if ([45,135].includes(rightD)) {
+            barDiv+= `<div class="d${rightD}r"></div>`;
+        }
+        barDiv+= `<div style="right: -10px; position: absolute; top: -5px">${rightD}</div>`;
+
+        return barDiv + `</div>`;
+    }
+
+    function appendResultsGraphics(leftD = 45, rightD = 45) {
+            let barsGraphics = ``;
+            const optionsString = globalLengths.map(({length}) => {
+                return `<option>${length}</option>`
+            }).join('');
+            barsGraphics+=`<div class="row top-buffer" xmlns="http://www.w3.org/1999/html">
+            ${this.getGraphicsBar(leftD, rightD)}
+            <div class="col-4"><input class="graphics" type="number" value=1 min= "1" /> x
+            <select id="resultSelection" type="number" >
+                ${optionsString}
+            </select>
+            mm </div>
+            </div>`;
+
+        $('#graphics').append(barsGraphics);
+
+    }
+
     function addInput() {
         inputs++;
         var classNameNo = `${CLASS_NAME_NO}${inputs}`;
@@ -109,6 +210,7 @@
     }
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 <label for="length">Lungime bara</label>
 <input class="bar_length"   type="text" onkeydown="return validate(event,this)"  /> mm
 <br /> <br />
@@ -120,9 +222,28 @@
 </div>
 <button onclick="calculateResult()">Calculeaza rezultat</button> &nbsp; &nbsp;
 <button onclick="addInput()">Adauga bucati dorite</button>
-
+<div class="btn-group barType">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        Alege tipul de bara
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(45, 45)">45------45</button></li>
+        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(45, 90)">45------90</button></li>
+        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(45, 135)">45-----135</button></li>
+        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(90, 90)">90------90</button></li>
+        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(90, 135)">90-----135</button></li>
+        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(135, 135)">135----135</button></li>
+    </ul>
+</div>
 <br />
-<div id="results">
+<div class="row">
+    <div class="col-4" id="results">
+
+    </div>
+    <div class="col-8" id="graphics">
+
+    </div>
+
 
 </div>
 </body>
