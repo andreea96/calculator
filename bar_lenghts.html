@@ -201,11 +201,23 @@
         inputs++;
         var classNameNo = `${CLASS_NAME_NO}${inputs}`;
         var classNameLength = `${CLASS_NAME_LENGTH}${inputs}`;
+        var profileTypeOptions =
+            `<option value="90">90</option>
+             <option value="45">45</option>
+             <option value="135">135</option>
+            `;
         var pieceInput =
-            `<input class="${classNameNo}" type="text" onkeydown="return validate(event, this)" name="pieceNr"/>
+            `<input class="${classNameNo}" type="text" value="1" onkeydown="return validate(event, this)" name="pieceNr"/>
                 bucati de
-                <input class="${classNameLength}" type="text" onkeydown="return validate(event, this)" name="pieceLength"/> mm
+                <select id="profileTypeLeft" name="profileTypeLeft">${profileTypeOptions}</select>
+                -----
+             <select id="profileTypeRight" name="profileTypeRight">${profileTypeOptions}</select>
+             |
+             <input class="${classNameLength}" type="text" onkeydown="return validate(event, this)" name="pieceLength"/> mm
+             <br /> <br /> Cod profil:
+             <input class="profileCode" type="text" size="100" />
             <hr> `;
+
         $("#pieces").append(pieceInput);
     }
 
@@ -222,29 +234,12 @@
 </div>
 <button onclick="calculateResult()">Calculeaza rezultat</button> &nbsp; &nbsp;
 <button onclick="addInput()">Adauga bucati dorite</button>
-<div class="btn-group barType">
-    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        Alege tipul de bara
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end">
-        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(45, 45)">45------45</button></li>
-        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(45, 90)">45------90</button></li>
-        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(45, 135)">45-----135</button></li>
-        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(90, 90)">90------90</button></li>
-        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(90, 135)">90-----135</button></li>
-        <li><button class="dropdown-item" type="button"  onclick="appendResultsGraphics(135, 135)">135----135</button></li>
-    </ul>
-</div>
+<br />
 <br />
 <div class="row">
-    <div class="col-4" id="results">
+    <div class="col-6" id="results">
 
     </div>
-    <div class="col-8" id="graphics">
-
-    </div>
-
-
 </div>
 </body>
 </html>
