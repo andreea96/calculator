@@ -82,6 +82,9 @@
     const CLASS_NAME_NO= 'no_input_';
     const CLASS_NAME_LENGTH= 'length_input_';
     const BAR_LENGTH= 'bar_length';
+    const CLASS_NAME_PROFILE_TYPE_LEFT = 'profile_type_left';
+    const CLASS_NAME_PROFILE_TYPE_RIGHT = 'profile_type_right';
+    const CLASS_NAME_PROFILE_CODE = 'profile_code';
     const BAR_CUT_WASTE = 8;
     var inputs = 0;
     var globalLengths = [];
@@ -103,8 +106,10 @@
         for(var i=1; i<=inputs; i++) {
             let length = parseInt($(`.${CLASS_NAME_LENGTH}${i}`)[0].value);
             let noLengths = parseInt($(`.${CLASS_NAME_NO}${i}`)[0].value);
+            let profileType = $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${i}`)[0].value + '----' + $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${i}`)[0].value;
+            let profileCode = $(`.${CLASS_NAME_PROFILE_CODE}${i}`)[0].value;
             if(!isNaN(noLengths) && !isNaN(length)){
-                lengthsArr.push({length, noLengths});
+                lengthsArr.push({length, noLengths, profileType, profileCode});
             }
         }
         lengthsArr = lengthsArr.sort((item1, item2) => {
@@ -117,7 +122,7 @@
             noBars++;
             let barRest = barLength;
             let barResultingPieces = [];
-            lengthsArr.forEach(({length, noLengths}, index) => {
+            lengthsArr.forEach(({length, noLengths, profileType, profileCode}, index) => {
                 let cutsMade = 0;
                 let potentialCuts = parseInt(barRest/(length+BAR_CUT_WASTE));
                 potentialCuts = potentialCuts <= noLengths
@@ -135,7 +140,9 @@
                 if(cutsMade > 0 ) {
                     barResultingPieces.push({
                         nrPieces: cutsMade,
-                        lengthPieces: length
+                        lengthPieces: length,
+                        profileType,
+                        profileCode
                     });
                 }
             }, lengthsArr)
@@ -155,9 +162,9 @@
         resultsArray.forEach((resultItem, index) => {
             text +=`<hr class="result">`
             text+= `Bara ${index+1}:<ul>`;
-            resultItem.barResultingPieces.forEach(({nrPieces, lengthPieces}) => {
+            resultItem.barResultingPieces.forEach(({nrPieces, lengthPieces, profileType, profileCode}) => {
                 let type = nrPieces === 1 ? `bucata` : `bucati`;
-                text+= `<li>${nrPieces} ${type} de ${lengthPieces} mm</li>`;
+                text+= `<li>${nrPieces} ${type} de ${lengthPieces} mm | ${profileType} | ${profileCode} </li> `;
             });
             text+=`</ul>`;
             text+=`Ramas din bara: ${resultItem.barRest} <br />`;
@@ -209,13 +216,13 @@
         var pieceInput =
             `<input class="${classNameNo}" type="text" value="1" onkeydown="return validate(event, this)" name="pieceNr"/>
                 bucati de
-                <select id="profileTypeLeft" name="profileTypeLeft">${profileTypeOptions}</select>
+                <select id="profileTypeLeft${inputs}" name="profileTypeLeft" class="${CLASS_NAME_PROFILE_TYPE_LEFT}${inputs}">${profileTypeOptions}</select>
                 -----
-             <select id="profileTypeRight" name="profileTypeRight">${profileTypeOptions}</select>
+             <select id="profileTypeRight${inputs}" name="profileTypeRight" class="${CLASS_NAME_PROFILE_TYPE_RIGHT}${inputs}">${profileTypeOptions}</select>
              |
              <input class="${classNameLength}" type="text" onkeydown="return validate(event, this)" name="pieceLength"/> mm
              <br /> <br /> Cod profil:
-             <input class="profileCode" type="text" size="100" />
+             <input class="${CLASS_NAME_PROFILE_CODE}${inputs}" type="text" size="100" />
             <hr> `;
 
         $("#pieces").append(pieceInput);
@@ -225,6 +232,9 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 <label for="length">Lungime bara</label>
 <input class="bar_length"   type="text" onkeydown="return validate(event,this)"  /> mm
+<br /> <br />
+<label for="project_name">Nume proiect</label>
+<input class="project_name"  type="text"  size="30" />
 <br /> <br />
 <i>*Nota: </i> Lamele taie 8 mm din teava
 <br />
