@@ -230,13 +230,23 @@
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
-<label for="length">Lungime bara</label>
-<input class="bar_length"   type="text" onkeydown="return validate(event,this)"  /> mm
-<br /> <br />
-<label for="project_name">Nume proiect</label>
-<input class="project_name"  type="text"  size="30" />
-<br /> <br />
-<i>*Nota: </i> Lamele taie 8 mm din teava
+<div class="row">
+    <div class="col-4">
+        <label for="length">Lungime bara</label>
+        <input class="bar_length"   type="text" onkeydown="return validate(event,this)"  /> mm
+        <br /> <br />
+        <label for="project_name">Nume proiect</label>
+        <input class="project_name"  type="text"  size="30" />
+        <br /> <br />
+        <i>*Nota: </i> Lamele taie 8 mm din teava
+    </div>
+    <div class="col-4">
+        <img src="https://raw.githubusercontent.com/andreea96/calculator/master/cap_stanga.png" alt="Capat stanga">
+    </div>
+    <div class="col-4">
+        <img src="https://raw.githubusercontent.com/andreea96/calculator/master/cap_dreapta.png" alt="Capat dreapta">
+    </div>
+</div>
 <br />
 <hr>
 <div id="pieces">
