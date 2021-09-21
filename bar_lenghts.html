@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Optimum cuts</title>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <style>
     hr.result{
@@ -85,6 +86,9 @@
     const CLASS_NAME_PROFILE_TYPE_LEFT = 'profile_type_left';
     const CLASS_NAME_PROFILE_TYPE_RIGHT = 'profile_type_right';
     const CLASS_NAME_PROFILE_CODE = 'profile_code';
+    const CLASS_NAME_PROFILE_WIDTH = 'profile_width';
+    const CLASS_NAME_PROFILE_HEIGHT = 'profile_height';
+    const CLASS_NAME_PROFILE_COLOR = 'profile_color';
     const BAR_CUT_WASTE = 8;
     var inputs = 0;
     var globalLengths = [];
@@ -109,8 +113,12 @@
             let profileTypeL = $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${i}`)[0].value;
             let profileTypeR = $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${i}`)[0].value;
             let profileCode = $(`.${CLASS_NAME_PROFILE_CODE}${i}`)[0].value;
+            let profileColor = $(`.${CLASS_NAME_PROFILE_COLOR}${i}`)[0].value;
+            let profileWidth = $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value;
+            let profileHeight = $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value;
+
             if(!isNaN(noLengths) && !isNaN(length)){
-                lengthsArr.push({length, noLengths, profileTypeL, profileTypeR, profileCode});
+                lengthsArr.push({length, noLengths, profileTypeL, profileTypeR, profileCode, profileColor, profileHeight, profileWidth});
             }
         }
         lengthsArr = lengthsArr.sort((item1, item2) => {
@@ -123,7 +131,7 @@
             noBars++;
             let barRest = barLength;
             let barResultingPieces = [];
-            lengthsArr.forEach(({length, noLengths, profileTypeL, profileTypeR, profileCode}, index) => {
+            lengthsArr.forEach(({length, noLengths, profileTypeL, profileTypeR, profileCode, profileColor, profileHeight, profileWidth}, index) => {
                 let cutsMade = 0;
                 let potentialCuts = parseInt(barRest/(length+BAR_CUT_WASTE));
                 potentialCuts = potentialCuts <= noLengths
@@ -144,7 +152,10 @@
                         lengthPieces: length,
                         profileTypeL,
                         profileTypeR,
-                        profileCode
+                        profileCode,
+                        profileColor,
+                        profileWidth,
+                        profileHeight
                     });
                 }
             }, lengthsArr)
@@ -153,8 +164,46 @@
                 return (value.noLengths !== 0);
             });
         }
+        buildDataTable(results, barLength);
         showResults(results, barLength);
         globalResults = results;
+    }
+    function buildDataTable(results, barLength) {
+        console.log(results);
+        const table = document.getElementById('datatable');
+        let i = 1;
+        let bars = [];
+        bars = results.map(result => result.barResultingPieces).flat();
+        bars.forEach(bar => {
+            const row = table.insertRow(i);
+            row.insertCell(0).innerText = '1';
+            row.insertCell(1).innerText = (new Date()).getFullYear();
+            row.insertCell(2).innerText = $('#project_name').val();
+            row.insertCell(3).innerText = bar.profileCode;
+            row.insertCell(4).innerText = bar.profileColor;
+            row.insertCell(5).innerText = bar.profileColor;
+            row.insertCell(6).innerText = `2vision_${bar.profileCode.replace(' ', '_')}.dxf`;
+            row.insertCell(7).innerText = bar.profileHeight;
+            row.insertCell(8).innerText = bar.profileWidth;
+            row.insertCell(9).innerText = '0';
+            row.insertCell(10).innerText = '123456789';
+            row.insertCell(11).innerText = '';
+            row.insertCell(12).innerText = barLength;
+            row.insertCell(13).innerText = bar.nrPieces;
+            row.insertCell(14).innerText = 'toc2670 900';
+            row.insertCell(15).innerText = bar.lengthPieces;
+            row.insertCell(16).innerText = bar.profileTypeL;
+            row.insertCell(17).innerText = bar.profileTypeR;
+            row.insertCell(18).innerText = '';
+            row.insertCell(19).innerText = '';
+            row.insertCell(20).innerText = '';
+            row.insertCell(21).innerText = 'info?';
+            row.insertCell(22).innerText = 'OMIFA';
+            row.insertCell(23).innerText = '';
+            row.insertCell(24).innerText = '';
+            i++;
+        })
+
     }
 
     function showResults(resultsArray, barLength) {
@@ -216,9 +265,22 @@
              <option value="135">135</option>
             `;
         var pieceInput =
-            `Cod profil:
-             <input class="${CLASS_NAME_PROFILE_CODE}${inputs}" type="text" size="100" />
-             <br /><br />
+            `
+             <table>
+             <tr>
+                <th>Cod profil</th>
+                <th>Culoare</th>
+                <th>Latime</th>
+                <th>Inaltime</th>
+             </tr>
+             <tr>
+                <td><input class="${CLASS_NAME_PROFILE_CODE}${inputs}" type="text" size="100" /></td>
+                <td><input class="${CLASS_NAME_PROFILE_COLOR}${inputs}" type="text"  value="anodizat" id="color"/></td>
+                <td><input class="${CLASS_NAME_PROFILE_WIDTH}${inputs}" type="text"  value="47.25" id="color"/></td>
+                <td><input class="${CLASS_NAME_PROFILE_HEIGHT}${inputs}" type="text"  value="62.82" id="color"/></td>
+             </tr>
+            </table>
+             <br />
              <input class="${classNameNo}" onClick="this.select();" type="text" value="1" onkeydown="return validate(event, this)" name="pieceNr"/>
                 bucati de
                 <select id="profileTypeLeft${inputs}" name="profileTypeLeft" class="${CLASS_NAME_PROFILE_TYPE_LEFT}${inputs}">${profileTypeOptions}</select>
@@ -229,15 +291,23 @@
             <hr> `;
         $("#pieces").append(pieceInput);
     }
+
+    function exportToExcel() {
+
+        var elt = document.getElementById('datatable');
+        var wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet1" });
+        return XLSX.writeFile(wb, 'clp_csv_cutting_list.xls');
+    }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 <div class="row">
     <div class="col-6">
         <label for="length">Lungime bara</label>
         <input class="bar_length"   type="text" onkeydown="return validate(event,this)"  /> mm
+        <u><a style="cursor: pointer; color: blue" onclick="exportToExcel()" onmouseover="" >Export to Excel</a></u>
         <br /> <br />
         <label for="project_name">Nume proiect</label> <br />
-        <textarea name="Text1" cols="60" rows="5"></textarea>
+        <textarea name="Text1" cols="60" rows="5", id="project_name"></textarea>
         <br /> <br />
         <i>*Nota: </i> Lamele taie 8 mm din teava
     </div>
@@ -254,7 +324,7 @@
 
 </div>
 <button onclick="calculateResult()">Calculeaza rezultat</button> &nbsp; &nbsp;
-<button onclick="addInput()">Adauga bucati dorite</button>
+<button onclick="addInput()">Adauga bucati dorite</button>  &nbsp; &nbsp;
 <br />
 <br />
 <div class="row">
@@ -262,6 +332,35 @@
 
     </div>
 </div>
+<table id="datatable"  style="display:none">
+<tr>
+    <td> job_id </td>
+    <td> job_year </td>
+    <td> job_name </td>
+    <td> mat_name </td>
+    <td> mat_color_internal</td>
+    <td> mat_color_external </td>
+    <td> mat_image </td>
+    <td> mat_profile_height </td>
+    <td> mat_profile_width </td>
+    <td> bar_id </td>
+    <td> bar_idcode </td>
+    <td> bar_count </td>
+    <td> bar_length </td>
+    <td> cut_pieces </td>
+    <td> cut_idcode </td>
+    <td> cut_length </td>
+    <td> cut_leftangle </td>
+    <td> cut_rightangle </td>
+    <td> cut_compound_leftangle </td>
+    <td> cut_compund_rightangle_saw </td>
+    <td> cut_label_file </td>
+    <td> cut_label_value1 </td>
+    <td> cut_label_value2 </td>
+    <td> cut_label_value3 </td>
+    <td> cut_label_value4 </td>
+</tr>
 
+</table>
 </body>
 </html>
