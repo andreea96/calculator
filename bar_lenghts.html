@@ -190,7 +190,7 @@
             row.insertCell(7).innerText = bar.profileHeight;
             row.insertCell(8).innerText = bar.profileWidth;
             row.insertCell(9).innerText = '0';
-            row.insertCell(10).innerText = 12345678 + '\n9';
+            row.insertCell(10).innerText = 'WWW.OMIFA.COM';
             row.insertCell(11).innerText = '';
             row.insertCell(12).innerText = barLength;
             row.insertCell(13).innerText = bar.nrPieces;
@@ -301,7 +301,7 @@
                 <td><input class="${CLASS_NAME_PROFILE_COLOR}${inputs}" type="text"  value="anodizat" id="color"/></td>
                 <td><input class="${CLASS_NAME_PROFILE_WIDTH}${inputs}" type="text"  value="47.25" id="width"/></td>
                 <td><input class="${CLASS_NAME_PROFILE_HEIGHT}${inputs}" type="text"  value="62.82" id="height"/></td>
-                <td><select class="${CLASS_NAME_PROFILE_MAT}${inputs}" id="mat">${dxfOptions}</select></td>
+                <td><select class="${CLASS_NAME_PROFILE_MAT}${inputs}" id="mat"  >${dxfOptions}</select></td>
              </tr>
             </table>
              <br />
@@ -314,6 +314,19 @@
              <input class="${classNameLength}" type="text" onkeydown="return validate(event, this)" name="pieceLength"/> mm
             <hr> `;
         $("#pieces").append(pieceInput);
+        if(inputs>1) { //precomplete the inputs (material, height, width, color)
+            //selected material
+            var currentSelect = $(`.${CLASS_NAME_PROFILE_MAT}${inputs}`)[0];
+            var previousSelect = $(`.${CLASS_NAME_PROFILE_MAT}${inputs-1}`)[0];
+            const selectedIndex = [...previousSelect.options].findIndex(option => option.selected === true);
+            currentSelect.options[selectedIndex].selected = true;
+            //color
+            $(`.${CLASS_NAME_PROFILE_COLOR}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_COLOR}${inputs-1}`)[0].value;
+            //height
+            $(`.${CLASS_NAME_PROFILE_HEIGHT}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_HEIGHT}${inputs-1}`)[0].value;
+            //width
+            $(`.${CLASS_NAME_PROFILE_WIDTH}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_WIDTH}${inputs-1}`)[0].value;
+        }
     }
 
     function exportToExcel() {
