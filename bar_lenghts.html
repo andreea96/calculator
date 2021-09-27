@@ -126,22 +126,25 @@
                 $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 47.6;
                 break;
             case PROFILE_MATERIALS.DXF_TOC_SINGLEV2019:
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 50;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 55.2;
+                break;
             case PROFILE_MATERIALS.DXF_2V:
             case PROFILE_MATERIALS.DXF_TOC_2V2019:
                 $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 50;
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 0;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 100;
                 break;
             case PROFILE_MATERIALS.DXF_LEAF_PROFILE:
                 $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 68;
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 0;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 48;
                 break;
             case PROFILE_MATERIALS.DXF_2V2019:
                 $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 35;
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 0;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 100;
                 break;
             default:
-                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 0;
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 0;
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = "";
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = "";
         }
     }
 
@@ -372,15 +375,15 @@
              <tr>
                 <th>Cod profil</th>
                 <th>Culoare</th>
-                <th>Latime</th>
                 <th>Inaltime</th>
+                <th>Latime</th>
                 <th>Material (dxf)</th>
              </tr>
              <tr>
                 <td><input class="${CLASS_NAME_PROFILE_CODE}${inputs}" type="text" size="100" /></td>
                 <td><input class="${CLASS_NAME_PROFILE_COLOR}${inputs}" type="text"  value="anodizat" id="color"/></td>
-                <td><input class="${CLASS_NAME_PROFILE_WIDTH}${inputs}" type="text"  value="47.25" id="width"/></td>
-                <td><input class="${CLASS_NAME_PROFILE_HEIGHT}${inputs}" type="text"  value="62.82" id="height"/></td>
+                <td><input class="${CLASS_NAME_PROFILE_HEIGHT}${inputs}" type="text" id="height"/></td>
+                <td><input class="${CLASS_NAME_PROFILE_WIDTH}${inputs}" type="text"  id="width"/></td>
                 <td><select class="${CLASS_NAME_PROFILE_MAT}${inputs} ${CLASS_NAME_PROFILE_MAT}" id="mat" onchange="changeProfileLengthValues(inputs, this.value)"  >${dxfOptions}</select></td>
              </tr>
             </table>
