@@ -7,23 +7,28 @@
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <style>
-    hr.result{
+    hr.result {
         border: 1px solid #775c6a;
         margin-right: 70%;
     }
-    input.graphics{
+
+    input.graphics {
         height: 24px;
         width: 60px;
     }
+
     .barType {
         margin-left: 30%;
     }
 
-    .top-buffer { margin-top: 10px; }
+    .top-buffer {
+        margin-top: 10px;
+    }
+
     /*
      BAR VISUALS
     */
-    div.d90{
+    div.d90 {
         background-color: #ccc;
         border: 5px solid #ccc;
         height: 24px;
@@ -31,7 +36,7 @@
         width: 100%;
     }
 
-    div.d135l{
+    div.d135l {
         content: '45';
         position: absolute;
         border: 12px solid #ccc;
@@ -44,7 +49,7 @@
         border-color: white transparent transparent white;
     }
 
-    div.d135r{
+    div.d135r {
         content: '45';
         position: absolute;
         right: -5px;
@@ -65,7 +70,7 @@
         border-color: transparent transparent white white;
     }
 
-    div.d45r{
+    div.d45r {
         content: '45';
         position: absolute;
         right: -5px;
@@ -77,13 +82,14 @@
         border-bottom-color: white;
     }
 </style>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
 <body>
 <script>
-    const CLASS_NAME_NO= 'no_input_';
-    const CLASS_NAME_LENGTH= 'length_input_';
-    const BAR_LENGTH= 'bar_length';
+    const CLASS_NAME_NO = 'no_input_';
+    const CLASS_NAME_LENGTH = 'length_input_';
+    const BAR_LENGTH = 'bar_length';
     const CLASS_NAME_PROFILE_TYPE_LEFT = 'profile_type_left';
     const CLASS_NAME_PROFILE_TYPE_RIGHT = 'profile_type_right';
     const CLASS_NAME_PROFILE_CODE = 'profile_code';
@@ -94,22 +100,66 @@
     const BAR_CUT_WASTE = 8;
     var inputs = 0;
     var globalLengths = [];
+    const PROFILE_MATERIALS = {
+        DXF_2V: 'Profil 2 Vision.dxf',
+        DXF_2V2019: 'Profil 2 Vision 2019.dxf',
+        DXF_ALUTEC: 'Profil Alutec 18.5x32 standard.dxf',
+        BAK_ECO: 'Profil ECO.bak',
+        DXF_ECO: 'Profil ECO.dxf',
+        DXF_H2V: 'Profil H 2 Vision.dxf',
+        DXF_SIMAX: 'simax_aripa_cercevea.dxf',
+        DXF_TOC_2V2019: 'Toc 2 Vision 2019.dxf',
+        DXF_TOC_2V: 'Toc 2 Vision.dxf',
+        DXF_ECO_TOC: 'Toc Eco Single.dxf',
+        DXF_TOC_ARCADE_OMIFA: 'Toc Single Arcade_Omifa.dxf',
+        DXF_TOC_SINGLE_SKY2019: 'Toc Single SKY 2019.dxf',
+        DXF_TOC_SINGLEV2019: 'Toc Single VISION 2019.dxf',
+        DXF_TOC_SINGLE: 'Toc Single.dxf',
+        DXF_LEAF_PROFILE: 'Leaf profile GSW Office Plus.dxf',
+        DXF_LUCE: 'luce.dxf',
+    };
 
-    function validate(event){
+    function changeProfileLengthValues(i, option) {
+        switch (option) {
+            case PROFILE_MATERIALS.DXF_LUCE:
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 60;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 47.6;
+                break;
+            case PROFILE_MATERIALS.DXF_TOC_SINGLEV2019:
+            case PROFILE_MATERIALS.DXF_2V:
+            case PROFILE_MATERIALS.DXF_TOC_2V2019:
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 50;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 0;
+                break;
+            case PROFILE_MATERIALS.DXF_LEAF_PROFILE:
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 68;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 0;
+                break;
+            case PROFILE_MATERIALS.DXF_2V2019:
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 35;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 0;
+                break;
+            default:
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 0;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 0;
+        }
+    }
+
+    function validate(event) {
         var keycode = (event.which) ? event.which : event.keyCode;
 
-        if (keycode > 31 && ((keycode < 48 || keycode > 57 ) && (keycode < 96 || keycode > 105))) {
+        if (keycode > 31 && ((keycode < 48 || keycode > 57) && (keycode < 96 || keycode > 105))) {
             alert(" You can enter only characters 0 to 9 ");
             return false;
         }
         return true;
     }
 
-    function calculateResult(){
+    function calculateResult() {
         let lengthsArr = [];
         //recreate array with all the lengths
         const barLength = parseInt($(`.${BAR_LENGTH}`)[0].value);
-        for(var i=1; i<=inputs; i++) {
+        for (var i = 1; i <= inputs; i++) {
             let length = parseInt($(`.${CLASS_NAME_LENGTH}${i}`)[0].value);
             let noLengths = parseInt($(`.${CLASS_NAME_NO}${i}`)[0].value);
             let profileTypeL = $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${i}`)[0].value;
@@ -120,8 +170,18 @@
             let profileHeight = $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value;
             let profileMat = $(`.${CLASS_NAME_PROFILE_MAT}${i}`)[0].value;
 
-            if(!isNaN(noLengths) && !isNaN(length)){
-                lengthsArr.push({length, noLengths, profileTypeL, profileTypeR, profileCode, profileColor, profileHeight, profileWidth, profileMat});
+            if (!isNaN(noLengths) && !isNaN(length)) {
+                lengthsArr.push({
+                    length,
+                    noLengths,
+                    profileTypeL,
+                    profileTypeR,
+                    profileCode,
+                    profileColor,
+                    profileHeight,
+                    profileWidth,
+                    profileMat
+                });
             }
         }
         lengthsArr = lengthsArr.sort((item1, item2) => {
@@ -130,26 +190,36 @@
         globalLengths = lengthsArr;
         let noBars = 0;
         let results = [];
-        while(lengthsArr.length !== 0) {
+        while (lengthsArr.length !== 0) {
             noBars++;
             let barRest = barLength;
             let barResultingPieces = [];
-            lengthsArr.forEach(({length, noLengths, profileTypeL, profileTypeR, profileCode, profileColor, profileHeight, profileWidth, profileMat}, index) => {
+            lengthsArr.forEach(({
+                                    length,
+                                    noLengths,
+                                    profileTypeL,
+                                    profileTypeR,
+                                    profileCode,
+                                    profileColor,
+                                    profileHeight,
+                                    profileWidth,
+                                    profileMat
+                                }, index) => {
                 let cutsMade = 0;
-                let potentialCuts = parseInt(barRest/(length+BAR_CUT_WASTE));
+                let potentialCuts = parseInt(barRest / (length + BAR_CUT_WASTE));
                 potentialCuts = potentialCuts <= noLengths
                     ? potentialCuts
                     : noLengths;
-                barRest-=potentialCuts*(length+BAR_CUT_WASTE);
+                barRest -= potentialCuts * (length + BAR_CUT_WASTE);
                 lengthsArr[index].noLengths -= potentialCuts;
                 cutsMade = potentialCuts;
-                if((potentialCuts < noLengths)   //poate mai putem adauga o bucata in plus eliminand ultima portiune de 8 mm
-                    &&(barRest - length) >= 0 ) {
-                      barRest -=length;
-                      lengthsArr[index].noLengths--;
-                      cutsMade++;
+                if ((potentialCuts < noLengths)   //poate mai putem adauga o bucata in plus eliminand ultima portiune de 8 mm
+                    && (barRest - length) >= 0) {
+                    barRest -= length;
+                    lengthsArr[index].noLengths--;
+                    cutsMade++;
                 }
-                if(cutsMade > 0 ) {
+                if (cutsMade > 0) {
                     barResultingPieces.push({
                         nrPieces: cutsMade,
                         lengthPieces: length,
@@ -172,10 +242,11 @@
         showResults(results, barLength);
         globalResults = results;
     }
+
     function buildDataTable(results, barLength) {
         console.log(results);
         const table = document.getElementById('datatable');
-        while(table.rows.length > 1) {
+        while (table.rows.length > 1) {
             table.deleteRow(1);
         }
         let i = 1;
@@ -193,7 +264,7 @@
             row.insertCell(7).innerText = bar.profileHeight;
             row.insertCell(8).innerText = bar.profileWidth;
             row.insertCell(9).innerText = '0';
-            row.insertCell(10).innerText = 'WWW.OMIFA.COM';
+            row.insertCell(10).innerText = 'WWW.OMIFA.RO';
             row.insertCell(11).innerText = '';
             row.insertCell(12).innerText = barLength;
             row.insertCell(13).innerText = bar.nrPieces;
@@ -218,14 +289,20 @@
         $('#results').empty().append(text);
         text = ``;
         resultsArray.forEach((resultItem, index) => {
-            text +=`<hr class="result">`
-            text+= `Bara ${index+1}:<ul>`;
-            resultItem.barResultingPieces.forEach(({nrPieces, lengthPieces, profileTypeL,profileTypeR, profileCode}) => {
+            text += `<hr class="result">`
+            text += `Bara ${index + 1}:<ul>`;
+            resultItem.barResultingPieces.forEach(({
+                                                       nrPieces,
+                                                       lengthPieces,
+                                                       profileTypeL,
+                                                       profileTypeR,
+                                                       profileCode
+                                                   }) => {
                 let type = nrPieces === 1 ? `bucata` : `bucati`;
-                text+= `<li>${nrPieces} ${type} de ${lengthPieces} mm | ${profileTypeL} ---- ${profileTypeR} | ${profileCode} </li> `;
+                text += `<li>${nrPieces} ${type} de ${lengthPieces} mm | ${profileTypeL} ---- ${profileTypeR} | ${profileCode} </li> `;
             });
-            text+=`</ul>`;
-            text+=`Ramas din bara: ${resultItem.barRest} <br />`;
+            text += `</ul>`;
+            text += `Ramas din bara: ${resultItem.barRest} <br />`;
         });
 
         $('#results').append(text);
@@ -233,23 +310,23 @@
 
     function getGraphicsBar(leftD = 45, rightD = 45) {
         let barDiv = `<div class="d90 col-8">${leftD}`;
-        if([45, 135].includes(leftD)) {
-            barDiv+= ` <div class="d${leftD}l"></div>`;
+        if ([45, 135].includes(leftD)) {
+            barDiv += ` <div class="d${leftD}l"></div>`;
         }
-        if ([45,135].includes(rightD)) {
-            barDiv+= `<div class="d${rightD}r"></div>`;
+        if ([45, 135].includes(rightD)) {
+            barDiv += `<div class="d${rightD}r"></div>`;
         }
-        barDiv+= `<div style="right: -10px; position: absolute; top: -5px">${rightD}</div>`;
+        barDiv += `<div style="right: -10px; position: absolute; top: -5px">${rightD}</div>`;
 
         return barDiv + `</div>`;
     }
 
     function appendResultsGraphics(leftD = 45, rightD = 45) {
-            let barsGraphics = ``;
-            const optionsString = globalLengths.map(({length}) => {
-                return `<option>${length}</option>`
-            }).join('');
-            barsGraphics+=`<div class="row top-buffer" xmlns="http://www.w3.org/1999/html">
+        let barsGraphics = ``;
+        const optionsString = globalLengths.map(({length}) => {
+            return `<option>${length}</option>`
+        }).join('');
+        barsGraphics += `<div class="row top-buffer" xmlns="http://www.w3.org/1999/html">
             ${this.getGraphicsBar(leftD, rightD)}
             <div class="col-4"><input class="graphics" type="number" value=1 min= "1" /> x
             <select id="resultSelection" type="number" >
@@ -304,7 +381,7 @@
                 <td><input class="${CLASS_NAME_PROFILE_COLOR}${inputs}" type="text"  value="anodizat" id="color"/></td>
                 <td><input class="${CLASS_NAME_PROFILE_WIDTH}${inputs}" type="text"  value="47.25" id="width"/></td>
                 <td><input class="${CLASS_NAME_PROFILE_HEIGHT}${inputs}" type="text"  value="62.82" id="height"/></td>
-                <td><select class="${CLASS_NAME_PROFILE_MAT}${inputs}" id="mat"  >${dxfOptions}</select></td>
+                <td><select class="${CLASS_NAME_PROFILE_MAT}${inputs} ${CLASS_NAME_PROFILE_MAT}" id="mat" onchange="changeProfileLengthValues(inputs, this.value)"  >${dxfOptions}</select></td>
              </tr>
             </table>
              <br />
@@ -317,38 +394,40 @@
              <input class="${classNameLength}" type="text" onkeydown="return validate(event, this)" name="pieceLength"/> mm
             <hr> `;
         $("#pieces").append(pieceInput);
-        if(inputs>1) { //precomplete the inputs (material, height, width, color)
+        if (inputs > 1) { //precomplete the inputs (material, height, width, color)
             //selected material
             var currentSelect = $(`.${CLASS_NAME_PROFILE_MAT}${inputs}`)[0];
-            var previousSelect = $(`.${CLASS_NAME_PROFILE_MAT}${inputs-1}`)[0];
+            var previousSelect = $(`.${CLASS_NAME_PROFILE_MAT}${inputs - 1}`)[0];
             const selectedIndex = [...previousSelect.options].findIndex(option => option.selected === true);
             currentSelect.options[selectedIndex].selected = true;
             //color
-            $(`.${CLASS_NAME_PROFILE_COLOR}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_COLOR}${inputs-1}`)[0].value;
+            $(`.${CLASS_NAME_PROFILE_COLOR}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_COLOR}${inputs - 1}`)[0].value;
             //height
-            $(`.${CLASS_NAME_PROFILE_HEIGHT}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_HEIGHT}${inputs-1}`)[0].value;
+            $(`.${CLASS_NAME_PROFILE_HEIGHT}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_HEIGHT}${inputs - 1}`)[0].value;
             //width
-            $(`.${CLASS_NAME_PROFILE_WIDTH}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_WIDTH}${inputs-1}`)[0].value;
+            $(`.${CLASS_NAME_PROFILE_WIDTH}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_WIDTH}${inputs - 1}`)[0].value;
         }
     }
 
     function exportToExcel() {
 
         var elt = document.getElementById('datatable');
-        var wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet1" });
+        var wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet1"});
         return XLSX.writeFile(wb, 'clp_csv_cutting_list_example.xls');
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+        crossorigin="anonymous"></script>
 <div class="row">
     <div class="col-6">
         <label for="length">Lungime bara</label>
-        <input class="bar_length"   type="text" onkeydown="return validate(event,this)"  /> mm
-        <u><a style="cursor: pointer; color: blue" onclick="exportToExcel()" onmouseover="" >Export to Excel</a></u>
-        <br /> <br />
-        <label for="project_name">Nume proiect</label> <br />
-        <textarea name="Text1" cols="60" rows="5", id="project_name"></textarea>
-        <br /> <br />
+        <input class="bar_length" type="text" onkeydown="return validate(event,this)"/> mm
+        <u><a style="cursor: pointer; color: blue" onclick="exportToExcel()" onmouseover="">Export to Excel</a></u>
+        <br/> <br/>
+        <label for="project_name">Nume proiect</label> <br/>
+        <textarea name="Text1" cols="60" rows="5" , id="project_name"></textarea>
+        <br/> <br/>
         <i>*Nota: </i> Lamele taie 8 mm din teava
     </div>
     <div class="col-3">
@@ -358,48 +437,48 @@
         <img src="https://raw.githubusercontent.com/andreea96/calculator/master/cap_dreapta.png" alt="Capat dreapta">
     </div>
 </div>
-<br />
+<br/>
 <hr>
 <div id="pieces">
 
 </div>
 <button onclick="calculateResult()">Calculeaza rezultat</button> &nbsp; &nbsp;
-<button onclick="addInput()">Adauga bucati dorite</button>  &nbsp; &nbsp;
-<br />
-<br />
+<button onclick="addInput()">Adauga bucati dorite</button> &nbsp; &nbsp;
+<br/>
+<br/>
 <div class="row">
     <div class="col-6" id="results">
 
     </div>
 </div>
-<table id="datatable"  style="display:none">
-<tr>
-    <td> job_id </td>
-    <td> job_year </td>
-    <td> job_name </td>
-    <td> mat_name </td>
-    <td> mat_color_internal</td>
-    <td> mat_color_external </td>
-    <td> mat_image </td>
-    <td> mat_profile_height </td>
-    <td> mat_profile_width </td>
-    <td> bar_id </td>
-    <td> bar_idcode </td>
-    <td> bar_count </td>
-    <td> bar_length </td>
-    <td> cut_pieces </td>
-    <td> cut_idcode </td>
-    <td> cut_length </td>
-    <td> cut_leftangle </td>
-    <td> cut_rightangle </td>
-    <td> cut_compound_leftangle </td>
-    <td> cut_compund_rightangle_saw </td>
-    <td> cut_label_file </td>
-    <td> cut_label_value1 </td>
-    <td> cut_label_value2 </td>
-    <td> cut_label_value3 </td>
-    <td> cut_label_value4 </td>
-</tr>
+<table id="datatable" style="display:none">
+    <tr>
+        <td> job_id</td>
+        <td> job_year</td>
+        <td> job_name</td>
+        <td> mat_name</td>
+        <td> mat_color_internal</td>
+        <td> mat_color_external</td>
+        <td> mat_image</td>
+        <td> mat_profile_height</td>
+        <td> mat_profile_width</td>
+        <td> bar_id</td>
+        <td> bar_idcode</td>
+        <td> bar_count</td>
+        <td> bar_length</td>
+        <td> cut_pieces</td>
+        <td> cut_idcode</td>
+        <td> cut_length</td>
+        <td> cut_leftangle</td>
+        <td> cut_rightangle</td>
+        <td> cut_compound_leftangle</td>
+        <td> cut_compund_rightangle_saw</td>
+        <td> cut_label_file</td>
+        <td> cut_label_value1</td>
+        <td> cut_label_value2</td>
+        <td> cut_label_value3</td>
+        <td> cut_label_value4</td>
+    </tr>
 
 </table>
 </body>
