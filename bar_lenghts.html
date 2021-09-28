@@ -254,6 +254,11 @@
         }
         let i = 1;
         let bars = [];
+        const convertAngle = (angle) => {
+            if(angle === 90) return angle;
+            if(angle < 90) return 135;
+            return 45;
+        };
         bars = results.map(result => result.barResultingPieces).flat();
         bars.forEach(bar => {
             const row = table.insertRow(i);
@@ -273,8 +278,8 @@
             row.insertCell(13).innerText = bar.nrPieces;
             row.insertCell(14).innerText = 'toc2670 900';
             row.insertCell(15).innerText = bar.lengthPieces;
-            row.insertCell(16).innerText = bar.profileTypeL;
-            row.insertCell(17).innerText = bar.profileTypeR;
+            row.insertCell(16).innerText = convertAngle(bar.profileTypeL) ;
+            row.insertCell(17).innerText = convertAngle(bar.profileTypeR) ;
             row.insertCell(18).innerText = '';
             row.insertCell(19).innerText = '';
             row.insertCell(20).innerText = '';
