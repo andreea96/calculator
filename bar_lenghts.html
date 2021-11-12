@@ -117,6 +117,7 @@
         DXF_TOC_SINGLE: 'Toc Single.dxf',
         DXF_LEAF_PROFILE: 'Leaf profile GSW Office Plus.dxf',
         DXF_LUCE: 'luce.dxf',
+        DXF_2V_BIGCERCEVEA: 'Profil 2 Vision Big Cercevea.dxf',
     };
 
     function changeProfileLengthValues(i, option) {
@@ -141,6 +142,10 @@
             case PROFILE_MATERIALS.DXF_2V2019:
                 $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 35;
                 $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 100;
+                break;
+            case PROFILE_MATERIALS.DXF_2V_BIGCERCEVEA:
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 62.9;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 47.6;
                 break;
             default:
                 $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = "";
@@ -255,8 +260,8 @@
         let i = 1;
         let bars = [];
         const convertAngle = (angle) => {
-            if(angle === 90) return angle;
-            if(angle < 90) return 135;
+            if (angle === 90) return angle;
+            if (angle < 90) return 135;
             return 45;
         };
         bars = results.map(result => result.barResultingPieces).flat();
@@ -278,8 +283,8 @@
             row.insertCell(13).innerText = bar.nrPieces;
             row.insertCell(14).innerText = 'toc2670 900';
             row.insertCell(15).innerText = bar.lengthPieces;
-            row.insertCell(16).innerText = convertAngle(bar.profileTypeL) ;
-            row.insertCell(17).innerText = convertAngle(bar.profileTypeR) ;
+            row.insertCell(16).innerText = convertAngle(bar.profileTypeL);
+            row.insertCell(17).innerText = convertAngle(bar.profileTypeR);
             row.insertCell(18).innerText = '';
             row.insertCell(19).innerText = '';
             row.insertCell(20).innerText = '';
@@ -329,24 +334,6 @@
         return barDiv + `</div>`;
     }
 
-    function appendResultsGraphics(leftD = 45, rightD = 45) {
-        let barsGraphics = ``;
-        const optionsString = globalLengths.map(({length}) => {
-            return `<option>${length}</option>`
-        }).join('');
-        barsGraphics += `<div class="row top-buffer" xmlns="http://www.w3.org/1999/html">
-            ${this.getGraphicsBar(leftD, rightD)}
-            <div class="col-4"><input class="graphics" type="number" value=1 min= "1" /> x
-            <select id="resultSelection" type="number" >
-                ${optionsString}
-            </select>
-            mm </div>
-            </div>`;
-
-        $('#graphics').append(barsGraphics);
-
-    }
-
     function addInput() {
         inputs++;
         var classNameNo = `${CLASS_NAME_NO}${inputs}`;
@@ -373,6 +360,7 @@
             <option value="Leaf profile GSW Office Plus.dxf">Leaf profile GSW Office Plus.dxf</option>
             <option value="luce.dxf">luce.dxf</option>
             <option value="Profil 2 Vision 2019.dxf">Profil 2 Vision 2019.dxf</option>
+            <option value="Profil 2 Vision Big Cercevea.dxf">Profil 2 Vision Big Cercevea.dxf</option>
         `
         var pieceInput =
             `
@@ -383,13 +371,15 @@
                 <th>Inaltime</th>
                 <th>Latime</th>
                 <th>Material (dxf)</th>
+                <th></th>
              </tr>
              <tr>
                 <td><input class="${CLASS_NAME_PROFILE_CODE}${inputs}" type="text" size="100" /></td>
                 <td><input class="${CLASS_NAME_PROFILE_COLOR}${inputs}" type="text"  value="anodizat" id="color"/></td>
                 <td><input class="${CLASS_NAME_PROFILE_HEIGHT}${inputs}" type="text" id="height"/></td>
                 <td><input class="${CLASS_NAME_PROFILE_WIDTH}${inputs}" type="text"  id="width"/></td>
-                <td><select class="${CLASS_NAME_PROFILE_MAT}${inputs} ${CLASS_NAME_PROFILE_MAT}" id="mat" onchange="changeProfileLengthValues(inputs, this.value)"  >${dxfOptions}</select></td>
+                <td><input type="text" name="mat" list="mat_names" onkeyup="changeProfileLengthValues(inputs, this.value)" class="${CLASS_NAME_PROFILE_MAT}${inputs} ${CLASS_NAME_PROFILE_MAT}">
+<datalist id="mat_names"  >${dxfOptions}</datalist></td>
              </tr>
             </table>
              <br />
