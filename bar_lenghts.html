@@ -260,7 +260,7 @@
         let i = 1;
         let bars = [];
         const convertAngle = (angle) => {
-            if (angle === 90) return angle;
+            if (Number(angle) === 90) return angle;
             if (angle < 90) return 135;
             return 45;
         };
@@ -378,7 +378,7 @@
                 <td><input class="${CLASS_NAME_PROFILE_COLOR}${inputs}" type="text"  value="anodizat" id="color"/></td>
                 <td><input class="${CLASS_NAME_PROFILE_HEIGHT}${inputs}" type="text" id="height"/></td>
                 <td><input class="${CLASS_NAME_PROFILE_WIDTH}${inputs}" type="text"  id="width"/></td>
-                <td><input type="text" name="mat" list="mat_names" onkeyup="changeProfileLengthValues(inputs, this.value)" class="${CLASS_NAME_PROFILE_MAT}${inputs} ${CLASS_NAME_PROFILE_MAT}">
+                <td><input type="text" name="mat" list="mat_names" onchange="changeProfileLengthValues(inputs, this.value)" class="${CLASS_NAME_PROFILE_MAT}${inputs} ${CLASS_NAME_PROFILE_MAT}">
 <datalist id="mat_names"  >${dxfOptions}</datalist></td>
              </tr>
             </table>
@@ -396,14 +396,23 @@
             //selected material
             var currentSelect = $(`.${CLASS_NAME_PROFILE_MAT}${inputs}`)[0];
             var previousSelect = $(`.${CLASS_NAME_PROFILE_MAT}${inputs - 1}`)[0];
-            const selectedIndex = [...previousSelect.options].findIndex(option => option.selected === true);
-            currentSelect.options[selectedIndex].selected = true;
+            currentSelect.value = previousSelect.value;
             //color
             $(`.${CLASS_NAME_PROFILE_COLOR}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_COLOR}${inputs - 1}`)[0].value;
             //height
             $(`.${CLASS_NAME_PROFILE_HEIGHT}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_HEIGHT}${inputs - 1}`)[0].value;
             //width
             $(`.${CLASS_NAME_PROFILE_WIDTH}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_WIDTH}${inputs - 1}`)[0].value;
+            //profile name
+            $(`.${CLASS_NAME_PROFILE_CODE}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_CODE}${inputs - 1}`)[0].value;
+            //left angle
+            $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${inputs - 1}`)[0].value;
+            //right angle
+            $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${inputs}`)[0].value = $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${inputs - 1}`)[0].value;
+            //number of pieces
+            $(`.${CLASS_NAME_NO}${inputs}`)[0].value = $(`.${CLASS_NAME_NO}${inputs - 1}`)[0].value;
+            //number of pieces
+            $(`.${CLASS_NAME_LENGTH}${inputs}`)[0].value = $(`.${CLASS_NAME_LENGTH}${inputs - 1}`)[0].value;
         }
     }
 
