@@ -99,6 +99,7 @@
     const CLASS_NAME_PROFILE_MAT = 'profile_mat';
     const BAR_CUT_WASTE = 8;
     var inputs = 0;
+    var door_inputs = 0;
     var globalLengths = [];
     const PROFILE_MATERIALS = {
         DXF_2V: 'Profil 2 Vision.dxf',
@@ -110,46 +111,57 @@
         DXF_SIMAX: 'simax_aripa_cercevea.dxf',
         DXF_TOC_2V2019: 'Toc 2 Vision 2019.dxf',
         DXF_TOC_2V: 'Toc 2 Vision.dxf',
-        DXF_ECO_TOC: 'Toc Eco Single.dxf',
-        DXF_TOC_ARCADE_OMIFA: 'Toc Single Arcade_Omifa.dxf',
-        DXF_TOC_SINGLE_SKY2019: 'Toc Single SKY 2019.dxf',
         DXF_TOC_SINGLEV2019: 'Toc Single VISION 2019.dxf',
-        DXF_TOC_SINGLE: 'Toc Single.dxf',
         DXF_LEAF_PROFILE: 'Leaf profile GSW Office Plus.dxf',
         DXF_LUCE: 'luce.dxf',
         DXF_2V_BIGCERCEVEA: '2vision_big_cercevea.dxf',
     };
+    const DOOR_TYPE = {
+        SX: 'SX',
+        DX:'DX'
+    };
+    const DOORJAMB_TYPE = {
+        SINGLE_GLASS: 'Single glass' ,
+        THIN: 'Subtire',
+        DOORJAMB_100: 'Toc 100'
+    };
 
-    function changeProfileLengthValues(i, option) {
+    const INPUT_TYPE = {
+        DOOR: 'door_',
+        CUSTOM: ''
+    };
+
+
+    function changeProfileLengthValues(i,type, option) {
         switch (option) {
             case PROFILE_MATERIALS.DXF_LUCE:
-                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 60;
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 47.6;
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`)[0].value = 60;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${type}${i}`)[0].value = 47.6;
                 break;
             case PROFILE_MATERIALS.DXF_TOC_SINGLEV2019:
-                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 50;
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 55.2;
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`)[0].value = 50;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${type}${i}`)[0].value = 55.2;
                 break;
             case PROFILE_MATERIALS.DXF_2V:
             case PROFILE_MATERIALS.DXF_TOC_2V2019:
-                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 50;
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 100;
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`)[0].value = 50;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${type}${i}`)[0].value = 100;
                 break;
             case PROFILE_MATERIALS.DXF_LEAF_PROFILE:
-                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 68;
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 48;
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`)[0].value = 68;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${type}${i}`)[0].value = 48;
                 break;
             case PROFILE_MATERIALS.DXF_2V2019:
-                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 35;
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 100;
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`)[0].value = 35;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${type}${i}`)[0].value = 100;
                 break;
             case PROFILE_MATERIALS.DXF_2V_BIGCERCEVEA:
-                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = 62.9;
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = 47.6;
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`)[0].value = 62.9;
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${type}${i}`)[0].value = 47.6;
                 break;
             default:
-                $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value = "";
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value = "";
+                $(`.${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`)[0].value = "";
+                $(`.${CLASS_NAME_PROFILE_WIDTH}${type}${i}`)[0].value = "";
         }
     }
 
@@ -252,7 +264,6 @@
     }
 
     function buildDataTable(results, barLength) {
-        console.log(results);
         const table = document.getElementById('datatable');
         while (table.rows.length > 1) {
             table.deleteRow(1);
@@ -297,6 +308,94 @@
 
     }
 
+    function addDoor(doorType) {
+        addDoorJamb(doorType,PROFILE_MATERIALS.DXF_TOC_SINGLEV2019);
+        addSash(doorType);
+    }
+    
+    function addSash(doorType = DOOR_TYPE.DX) {
+        [2721, 2721, 821, 821].map(length => {
+            const profileI = ++door_inputs;
+            const profileHtml = getInput(INPUT_TYPE.DOOR,door_inputs);
+            $("#door-pieces").append(profileHtml);
+            //precompletion
+            //select
+            $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${profileI}`)[0].value = PROFILE_MATERIALS.DXF_2V_BIGCERCEVEA;
+            changeProfileLengthValues(profileI, INPUT_TYPE.DOOR, PROFILE_MATERIALS.DXF_2V_BIGCERCEVEA);
+            //left angle
+            $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${profileI}`)[0].value = 45;
+            //right angle
+            $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${profileI}`)[0].value = 45;
+            //name
+            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = `${doorType}_cercevea`;
+            //length
+            $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].value=length;
+
+            //disable
+            //select
+            $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${profileI}`)[0].disabled  = true;
+            //left angle
+            $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${profileI}`)[0].disabled = true;
+            //right angle
+            $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${profileI}`)[0].disabled = true;
+            //length
+            $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].disabled=true;
+        });
+    }
+    function addDoorJamb(doorType, doorjambType) {
+        const lockI = (++door_inputs);
+        var lockHtml = getInput(INPUT_TYPE.DOOR, door_inputs);
+        const supPartI = (++door_inputs);
+        var supPartHtml = getInput(INPUT_TYPE.DOOR, door_inputs);
+        const hingeI = (++door_inputs);
+        var hingeHtml = getInput(INPUT_TYPE.DOOR, door_inputs);
+        $("#door-pieces").append(lockHtml);
+        $("#door-pieces").append(supPartHtml);
+        $("#door-pieces").append(hingeHtml);
+        //precompletion
+        //select
+        $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${lockI}`)[0].value = PROFILE_MATERIALS.DXF_TOC_SINGLEV2019;
+        $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = PROFILE_MATERIALS.DXF_TOC_SINGLEV2019;
+        $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = PROFILE_MATERIALS.DXF_TOC_SINGLEV2019;
+        changeProfileLengthValues(lockI, INPUT_TYPE.DOOR, PROFILE_MATERIALS.DXF_TOC_SINGLEV2019);
+        changeProfileLengthValues(supPartI, INPUT_TYPE.DOOR, PROFILE_MATERIALS.DXF_TOC_SINGLEV2019);
+        changeProfileLengthValues(hingeI, INPUT_TYPE.DOOR, PROFILE_MATERIALS.DXF_TOC_SINGLEV2019);
+        //left angle
+        $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${lockI}`)[0].value = 45;
+        $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = 45;
+        $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = 90;
+        //right angle
+        $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${lockI}`)[0].value = 90;
+        $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = 45;
+        $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = 45;
+        //names
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${lockI}`)[0].value = `${doorType}_iala`;
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = `${doorType}_partea superioara`;
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = `${doorType}_balama`;
+        //length
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].value=2773;
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].value=900;
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI}`)[0].value=2773;
+        //disable
+        //select
+        $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${lockI}`)[0].disabled  = true;
+        $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${supPartI}`)[0].disabled = true;
+        $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${hingeI}`)[0].disabled = true;
+        //left angle
+        $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${lockI}`)[0].disabled = true;
+        $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${supPartI}`)[0].disabled = true;
+        $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${hingeI}`)[0].disabled = true;
+        //right angle
+        $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${lockI}`)[0].disabled = true;
+        $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${supPartI}`)[0].disabled = true;
+        $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${hingeI}`)[0].disabled = true;
+        //length
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].disabled=true;
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].disabled=true;
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI}`)[0].disabled=true;
+
+    }
+
     function showResults(resultsArray, barLength) {
         let text = `Bari de ${barLength} necesare: <b>${resultsArray.length}</b> <br />`;
         $('#results').empty().append(text);
@@ -321,23 +420,10 @@
         $('#results').append(text);
     }
 
-    function getGraphicsBar(leftD = 45, rightD = 45) {
-        let barDiv = `<div class="d90 col-8">${leftD}`;
-        if ([45, 135].includes(leftD)) {
-            barDiv += ` <div class="d${leftD}l"></div>`;
-        }
-        if ([45, 135].includes(rightD)) {
-            barDiv += `<div class="d${rightD}r"></div>`;
-        }
-        barDiv += `<div style="right: -10px; position: absolute; top: -5px">${rightD}</div>`;
-
-        return barDiv + `</div>`;
-    }
-
-    function addInput() {
-        inputs++;
-        var classNameNo = `${CLASS_NAME_NO}${inputs}`;
-        var classNameLength = `${CLASS_NAME_LENGTH}${inputs}`;
+    function getInput (profileType, inputs) {
+        const functionInputs = inputs;
+        var classNameNo = `${CLASS_NAME_NO}${profileType}${inputs}`;
+        var classNameLength = `${CLASS_NAME_LENGTH}${profileType}${inputs}`;
         var profileTypeOptions =
             `<option value="90">90</option>
              <option value="45">45</option>
@@ -352,11 +438,7 @@
             <option value="simax_aripa_cercevea.dxf">simax_aripa_cercevea.dxf</option>
             <option value="Toc 2 Vision 2019.dxf">Toc 2 Vision 2019.dxf</option>
             <option value="Toc 2 Vision.dxf">Toc 2 Vision.dxf</option>
-            <option value="Toc Eco Single.dxf">Toc Eco Single.dxf</option>
-            <option value="Toc Single Arcade_Omifa.dxf">Toc Single Arcade_Omifa.dxf</option>
-            <option value="Toc Single SKY 2019.dxf">Toc Single SKY 2019.dxf</option>
             <option value="Toc Single VISION 2019.dxf">Toc Single VISION 2019.dxf</option>
-            <option value="Toc Single.dxf">Toc Single.dxf</option>
             <option value="Leaf profile GSW Office Plus.dxf">Leaf profile GSW Office Plus.dxf</option>
             <option value="luce.dxf">luce.dxf</option>
             <option value="Profil 2 Vision 2019.dxf">Profil 2 Vision 2019.dxf</option>
@@ -367,31 +449,44 @@
              <table>
              <tr>
                 <th>Cod profil</th>
-                <th>Culoare</th>
+             </tr>
+             <tr>
+                <td><input class="${CLASS_NAME_PROFILE_CODE}${profileType}${inputs}" type="text" size="100" /></td>
+             </tr>
+            </table>
+            <table>
+            <tr>
+            <th>Culoare</th>
                 <th>Inaltime</th>
                 <th>Latime</th>
                 <th>Material (dxf)</th>
-                <th></th>
-             </tr>
-             <tr>
-                <td><input class="${CLASS_NAME_PROFILE_CODE}${inputs}" type="text" size="100" /></td>
-                <td><input class="${CLASS_NAME_PROFILE_COLOR}${inputs}" type="text"  value="anodizat" id="color"/></td>
-                <td><input class="${CLASS_NAME_PROFILE_HEIGHT}${inputs}" type="text" id="height"/></td>
-                <td><input class="${CLASS_NAME_PROFILE_WIDTH}${inputs}" type="text"  id="width"/></td>
-                <td><input type="text" name="mat" list="mat_names" onchange="changeProfileLengthValues(inputs, this.value)" class="${CLASS_NAME_PROFILE_MAT}${inputs} ${CLASS_NAME_PROFILE_MAT}">
-<datalist id="mat_names"  >${dxfOptions}</datalist></td>
-             </tr>
+            </tr>
+            <tr>
+              <td><input class="${CLASS_NAME_PROFILE_COLOR}${profileType}${inputs}" type="text"  value="anodizat" id="color"/></td>
+                <td><input class="${CLASS_NAME_PROFILE_HEIGHT}${profileType}${inputs}" type="text" id="height"/></td>
+                <td><input class="${CLASS_NAME_PROFILE_WIDTH}${profileType}${inputs}" type="text"  id="width"/></td>
+                <td>
+                    <input type="text" name="mat" list="mat_names" onchange="changeProfileLengthValues( ${functionInputs}, '${profileType}', this.value)" class="${CLASS_NAME_PROFILE_MAT}${profileType}${inputs} ${CLASS_NAME_PROFILE_MAT}">
+                    <datalist id="mat_names"  >${dxfOptions}</datalist>
+                </td>
+            </tr>
             </table>
              <br />
              <input class="${classNameNo}" onClick="this.select();" type="text" value="1" onkeydown="return validate(event, this)" name="pieceNr"/>
                 bucati de
-                <select id="profileTypeLeft${inputs}" name="profileTypeLeft" class="${CLASS_NAME_PROFILE_TYPE_LEFT}${inputs}">${profileTypeOptions}</select>
+                <select id="profileTypeLeft${inputs}" name="profileTypeLeft" class="${CLASS_NAME_PROFILE_TYPE_LEFT}${profileType}${inputs}">${profileTypeOptions}</select>
                 -----
-             <select id="profileTypeRight${inputs}" name="profileTypeRight" class="${CLASS_NAME_PROFILE_TYPE_RIGHT}${inputs}">${profileTypeOptions}</select>
+             <select id="profileTypeRight${inputs}" name="profileTypeRight" class="${CLASS_NAME_PROFILE_TYPE_RIGHT}${profileType}${inputs}">${profileTypeOptions}</select>
              |
              <input class="${classNameLength}" type="text" onkeydown="return validate(event, this)" name="pieceLength"/> mm
-            <hr> `;
-        $("#pieces").append(pieceInput);
+            <hr style="width: 95%"> `;
+
+        return pieceInput;
+    }
+    function addInput() {
+        inputs++;
+        const inputHtml = getInput(INPUT_TYPE.CUSTOM, inputs);
+        $("#pieces").append(inputHtml);
         if (inputs > 1) { //precomplete the inputs (material, height, width, color)
             //selected material
             var currentSelect = $(`.${CLASS_NAME_PROFILE_MAT}${inputs}`)[0];
@@ -426,6 +521,9 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
         crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <div class="row">
     <div class="col-6">
         <label for="length">Lungime bara</label>
@@ -445,12 +543,20 @@
     </div>
 </div>
 <br/>
-<hr>
-<div id="pieces">
-
-</div>
 <button onclick="calculateResult()">Calculeaza rezultat</button> &nbsp; &nbsp;
-<button onclick="addInput()">Adauga bucati dorite</button> &nbsp; &nbsp;
+<button onclick="addInput()" >Adauga bucati dorite</button>
+<button class=" dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-left: 35%">
+        Adauga usa
+</button>
+<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX</a>
+    <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX)">SX</a>
+</div>
+<hr>
+<div class ="row" >
+    <div id="pieces" class="col-6"></div>
+    <div id="door-pieces" class="col-6"></div>
+</div>
 <br/>
 <br/>
 <div class="row">
