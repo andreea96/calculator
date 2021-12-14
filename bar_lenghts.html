@@ -204,6 +204,33 @@
                 });
             }
         }
+        //add doors
+        for (var i = 1; i <= door_inputs; i++) {
+            let length = parseInt($(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${i}`)[0].value);
+            let noLengths = parseInt($(`.${CLASS_NAME_NO}${INPUT_TYPE.DOOR}${i}`)[0].value);
+            let profileTypeL = $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${i}`)[0].value;
+            let profileTypeR = $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${i}`)[0].value;
+            let profileCode = $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${i}`)[0].value;
+            let profileColor = $(`.${CLASS_NAME_PROFILE_COLOR}${INPUT_TYPE.DOOR}${i}`)[0].value;
+            let profileWidth = $(`.${CLASS_NAME_PROFILE_WIDTH}${INPUT_TYPE.DOOR}${i}`)[0].value;
+            let profileHeight = $(`.${CLASS_NAME_PROFILE_HEIGHT}${INPUT_TYPE.DOOR}${i}`)[0].value;
+            let profileMat = $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${i}`)[0].value;
+
+            if (!isNaN(noLengths) && !isNaN(length)) {
+                lengthsArr.push({
+                    length,
+                    noLengths,
+                    profileTypeL,
+                    profileTypeR,
+                    profileCode,
+                    profileColor,
+                    profileHeight,
+                    profileWidth,
+                    profileMat
+                });
+            }
+        }
+
         lengthsArr = lengthsArr.sort((item1, item2) => {
             return -(item1.length - item2.length)
         });
@@ -314,7 +341,9 @@
     }
     
     function addSash(doorType = DOOR_TYPE.DX) {
-        [2721, 2721, 821, 821].map(length => {
+        const lengthPart = ['balama', 'iala'];
+        [2721, 2721, 821, 821].map((length, i) => {
+            console.log(parseInt((i+1)%2));
             const profileI = ++door_inputs;
             const profileHtml = getInput(INPUT_TYPE.DOOR,door_inputs);
             $("#door-pieces").append(profileHtml);
@@ -327,7 +356,7 @@
             //right angle
             $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${profileI}`)[0].value = 45;
             //name
-            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = `${doorType}_cercevea`;
+            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = `${doorType}_cercevea_${lengthPart[parseInt((i+1)%2)]}`;
             //length
             $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].value=length;
 
@@ -549,8 +578,8 @@
         Adauga usa
 </button>
 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX</a>
-    <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX)">SX</a>
+    <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX --> sub mocheta</a>
+    <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX --> pe mocheta </a>
 </div>
 <hr>
 <div class ="row" >
