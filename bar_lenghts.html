@@ -12,6 +12,10 @@
         margin-right: 70%;
     }
 
+    div .sash {
+        background-color: aliceblue;
+    }
+
     input.graphics {
         height: 24px;
         width: 60px;
@@ -128,9 +132,20 @@
 
     const INPUT_TYPE = {
         DOOR: 'door_',
-        CUSTOM: ''
+        CUSTOM: '_'
     };
-
+    const RUG_LENGTH=7;
+    const doorDependencyGraph = {
+        1: [4,5], //height
+        2: [6,7], //width
+        3: [4, 5] //height,
+    };
+    const doorjambDependency = {
+        1: 3,
+        3: 1
+    };
+    const WIDTH_DIFFERENCE = 79;
+    const HEIGHT_DIFFERENCE = 52;
 
     function changeProfileLengthValues(i,type, option) {
         switch (option) {
@@ -180,15 +195,15 @@
         //recreate array with all the lengths
         const barLength = parseInt($(`.${BAR_LENGTH}`)[0].value);
         for (var i = 1; i <= inputs; i++) {
-            let length = parseInt($(`.${CLASS_NAME_LENGTH}${i}`)[0].value);
-            let noLengths = parseInt($(`.${CLASS_NAME_NO}${i}`)[0].value);
-            let profileTypeL = $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${i}`)[0].value;
-            let profileTypeR = $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${i}`)[0].value;
-            let profileCode = $(`.${CLASS_NAME_PROFILE_CODE}${i}`)[0].value;
-            let profileColor = $(`.${CLASS_NAME_PROFILE_COLOR}${i}`)[0].value;
-            let profileWidth = $(`.${CLASS_NAME_PROFILE_WIDTH}${i}`)[0].value;
-            let profileHeight = $(`.${CLASS_NAME_PROFILE_HEIGHT}${i}`)[0].value;
-            let profileMat = $(`.${CLASS_NAME_PROFILE_MAT}${i}`)[0].value;
+            let length = parseInt($(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.CUSTOM}${i}`)[0].value);
+            let noLengths = parseInt($(`.${CLASS_NAME_NO}${INPUT_TYPE.CUSTOM}${i}`)[0].value);
+            let profileTypeL = $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.CUSTOM}${i}`)[0].value;
+            let profileTypeR = $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.CUSTOM}${i}`)[0].value;
+            let profileCode = $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.CUSTOM}${i}`)[0].value;
+            let profileColor = $(`.${CLASS_NAME_PROFILE_COLOR}${INPUT_TYPE.CUSTOM}${i}`)[0].value;
+            let profileWidth = $(`.${CLASS_NAME_PROFILE_WIDTH}${INPUT_TYPE.CUSTOM}${i}`)[0].value;
+            let profileHeight = $(`.${CLASS_NAME_PROFILE_HEIGHT}${INPUT_TYPE.CUSTOM}${i}`)[0].value;
+            let profileMat = $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.CUSTOM}${i}`)[0].value;
 
             if (!isNaN(noLengths) && !isNaN(length)) {
                 lengthsArr.push({
@@ -335,17 +350,17 @@
 
     }
 
-    function addDoor(doorType) {
-        addDoorJamb(doorType,PROFILE_MATERIALS.DXF_TOC_SINGLEV2019);
-        addSash(doorType);
+    function addDoor(doorType, isOnRug = false) {
+        addDoorJamb(doorType, isOnRug);
+        addSash(doorType, isOnRug);
     }
     
-    function addSash(doorType = DOOR_TYPE.DX) {
-        const lengthPart = ['balama', 'iala'];
-        [2721, 2721, 821, 821].map((length, i) => {
-            console.log(parseInt((i+1)%2));
+    function addSash(doorType = DOOR_TYPE.DX, isOnRug = false) {
+        const lengthParts = ['balama', 'iala'];
+        const lengths = isOnRug ? [2721, 2721, 821, 821] : [2287, 2287, 821, 821]
+        lengths.map((length, i) => {
             const profileI = ++door_inputs;
-            const profileHtml = getInput(INPUT_TYPE.DOOR,door_inputs);
+            const profileHtml = `<div class="sash"}>${getInput(INPUT_TYPE.DOOR,door_inputs)}</div>`;
             $("#door-pieces").append(profileHtml);
             //precompletion
             //select
@@ -356,9 +371,9 @@
             //right angle
             $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${profileI}`)[0].value = 45;
             //name
-            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = `${doorType}_cercevea_${lengthPart[parseInt((i+1)%2)]}`;
+            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = `${doorType}_cercevea_${lengthParts[parseInt((i+1)%2)]}`;
             //length
-            $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].value=length;
+            $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].value= length;
 
             //disable
             //select
@@ -371,7 +386,7 @@
             $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].disabled=true;
         });
     }
-    function addDoorJamb(doorType, doorjambType) {
+    function addDoorJamb(doorType, isOnRug) {
         const lockI = (++door_inputs);
         var lockHtml = getInput(INPUT_TYPE.DOOR, door_inputs);
         const supPartI = (++door_inputs);
@@ -402,9 +417,13 @@
         $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = `${doorType}_partea superioara`;
         $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = `${doorType}_balama`;
         //length
-        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].value=2773;
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].value= isOnRug ? 2773 : 2339;
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].value=900;
-        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI}`)[0].value=2773;
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI}`)[0].value= isOnRug ? 2773 : 2339;
+        //add event listener
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].addEventListener('input', doorjambValueChange);
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].addEventListener('input', doorjambValueChange);
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI}`)[0].addEventListener('input', doorjambValueChange);
         //disable
         //select
         $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${lockI}`)[0].disabled  = true;
@@ -418,11 +437,21 @@
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${lockI}`)[0].disabled = true;
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${supPartI}`)[0].disabled = true;
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${hingeI}`)[0].disabled = true;
-        //length
-        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].disabled=true;
-        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].disabled=true;
-        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI}`)[0].disabled=true;
+    }
 
+    function doorjambValueChange(e) {
+        const profileIndex = parseInt(e.target.className.split('_').slice(-1)[0]);
+        const profileBatch = parseInt(profileIndex/7)+1;
+        const newValue = e.target.value;
+        doorDependencyGraph[profileIndex%7].forEach(i => {
+            console.log(i*profileBatch, i, profileBatch, profileIndex);
+                $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${7*(profileBatch-1)+i}`)[0].value = newValue - (profileIndex == 2 ? WIDTH_DIFFERENCE : HEIGHT_DIFFERENCE);
+        });
+        //additional height update
+        const similarProfileIndex = doorjambDependency[profileIndex%7];
+        if(similarProfileIndex){
+            $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${7*(profileBatch-1) + similarProfileIndex}`)[0].value = newValue;
+        }
     }
 
     function showResults(resultsArray, barLength) {
@@ -503,7 +532,7 @@
              <br />
              <input class="${classNameNo}" onClick="this.select();" type="text" value="1" onkeydown="return validate(event, this)" name="pieceNr"/>
                 bucati de
-                <select id="profileTypeLeft${inputs}" name="profileTypeLeft" class="${CLASS_NAME_PROFILE_TYPE_LEFT}${profileType}${inputs}">${profileTypeOptions}</select>
+                <select id="profileTypeLeft${inputs}" name="profileTypeLeft" class="${CLASS_NAME_PROFILE_TYPE_LEFT}${profileType}${inputs} ">${profileTypeOptions}</select>
                 -----
              <select id="profileTypeRight${inputs}" name="profileTypeRight" class="${CLASS_NAME_PROFILE_TYPE_RIGHT}${profileType}${inputs}">${profileTypeOptions}</select>
              |
@@ -578,8 +607,8 @@
         Adauga usa
 </button>
 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX --> sub mocheta</a>
-    <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX --> pe mocheta </a>
+    <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX --> <b>sub</b> mocheta</a>
+    <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX, true)">DX --> <b>pe</b> mocheta </a>
 </div>
 <hr>
 <div class ="row" >
