@@ -89,7 +89,6 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
-<>
 <script>
     const CLASS_NAME_NO = 'no_input_';
     const CLASS_NAME_LENGTH = 'length_input_';
@@ -138,7 +137,6 @@
         DOOR: 'door_',
         CUSTOM: '_'
     };
-    const RUG_LENGTH=434;
     const doorDependencyGraph = {
         1: [4,5], //height
         2: [6,7], //width
@@ -149,7 +147,8 @@
         3: 1
     };
     const WIDTH_DIFFERENCE = 79;
-    const HEIGHT_DIFFERENCE = 52;
+    const HEIGHT_DIFFERENCE_ON_RUG = 52;
+    const RUG_LENGTH=7;
 
     window.onload = (event) => {
         //append door jamb selection options
@@ -165,6 +164,7 @@
     };
 
     function changeProfileLengthValues(i,type, option) {
+        console.log(option);
         switch (option) {
             case PROFILE_MATERIALS.DXF_LUCE:
                 $(`.${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`)[0].value = 60;
@@ -369,26 +369,38 @@
 
     function addDoor(doorType, isOnRug = false) {
         //fetch values
-        const doorWidth = $('#door_width')[0].value;
-        const doorHeight = $('#door_height')[0].value;
-        const doorPieces = $('#door_pieces')[0].value;
+        const doorWidth = Number($('#door_width')[0].value);
+        const doorHeight = Number($('#door_height')[0].value);
+        const doorPieces = Number($('#door_pieces')[0].value);
         const doorJambSelectionValue = $('#door_jamb_selection')[0].value;
         const doorSashSelectionValue = $('#door_sash_selection')[0].value;
-        console.log(doo)
         //add profiles
         for(let i=1;i<=doorPieces;i++) {
             addDoorJamb(doorType, isOnRug, doorJambSelectionValue, doorHeight, doorWidth);
             if(doorSashSelectionValue !== NO_SASH) {
-                addSash(doorType, isOnRug, doorJambSelectionValue);
+                addSash(doorType, isOnRug, doorWidth, doorHeight);
             }
         }
 
     }
     
-    function addSash(doorType = DOOR_TYPE.DX, isOnRug = false) {
-        const lengthParts = ['balama', 'iala'];
-        const lengths = isOnRug ? [2721, 2721, 821, 821] : [2287, 2287, 821, 821]
-        lengths.map((length, i) => {
+    function addSash(doorType = DOOR_TYPE.DX, isOnRug = false, doorWidth, doorHeight) {
+        const sashParts = [
+            {
+                name: doorType === DOOR_TYPE.DX ? 'iala' : 'balama',
+                length: doorHeight - HEIGHT_DIFFERENCE_ON_RUG - (isOnRug ? 0 : RUG_LENGTH)
+            }, {
+                name: doorType === DOOR_TYPE.DX ? 'balama' : 'iala',
+                length: doorHeight - HEIGHT_DIFFERENCE_ON_RUG - (isOnRug ? 0 : RUG_LENGTH)
+            }, {
+                name: doorType === DOOR_TYPE.DX ? 'superioara' : 'inferioara',
+                length: doorWidth - WIDTH_DIFFERENCE
+            }, {
+                name: doorType === DOOR_TYPE.DX ? 'inferioara' : 'superioara',
+                length: doorHeight - WIDTH_DIFFERENCE
+            },
+        ]
+        sashParts.map(({length, name}, i) => {
             const profileI = ++door_inputs;
             const profileHtml = `<div class="sash"}>${getInput(INPUT_TYPE.DOOR,door_inputs)}</div>`;
             $("#door-pieces").append(profileHtml);
@@ -401,7 +413,7 @@
             //right angle
             $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${profileI}`)[0].value = 45;
             //name
-            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = `${doorType}_cercevea_${lengthParts[parseInt((i+1)%2)]}`;
+            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = `${doorType}_cercevea_${name}`;
             //length
             $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].value= length;
 
@@ -431,9 +443,9 @@
         $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${lockI}`)[0].value = profileDXF;
         $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = profileDXF;
         $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = profileDXF;
-        changeProfileLengthValues(lockI, INPUT_TYPE.DOOR, PROFILE_MATERIALS.DXF_TOC_SINGLEV2019);
-        changeProfileLengthValues(supPartI, INPUT_TYPE.DOOR, PROFILE_MATERIALS.DXF_TOC_SINGLEV2019);
-        changeProfileLengthValues(hingeI, INPUT_TYPE.DOOR, PROFILE_MATERIALS.DXF_TOC_SINGLEV2019);
+        changeProfileLengthValues(lockI, INPUT_TYPE.DOOR, profileDXF);
+        changeProfileLengthValues(supPartI, INPUT_TYPE.DOOR, profileDXF);
+        changeProfileLengthValues(hingeI, INPUT_TYPE.DOOR, profileDXF);
         //left angle
         $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${lockI}`)[0].value = 45;
         $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = 45;
@@ -443,13 +455,13 @@
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = 45;
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = 45;
         //names
-        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${lockI}`)[0].value = `${doorType}_iala`;
-        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = `${doorType}_partea superioara`;
-        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = `${doorType}_balama`;
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${lockI}`)[0].value = `${doorType}_${doorType === DOOR_TYPE.DX? 'iala' : 'balama'}`;
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = `${doorType}_partea_superioara`;
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = `${doorType}_${doorType === DOOR_TYPE.DX? 'balama' : 'iala'}`;
         //length
-        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].value= isOnRug ? doorHeight + RUG_LENGTH : doorHeight;
-        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].value=doorWidth;
-        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI}`)[0].value= isOnRug ? doorHeight + RUG_LENGTH : doorHeight;
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].value= doorHeight;
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = doorWidth;
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI}`)[0].value=  doorHeight;
         //add event listener
         // $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].addEventListener('input', doorjambValueChange);
         // $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].addEventListener('input', doorjambValueChange);
@@ -469,8 +481,8 @@
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${hingeI}`)[0].disabled = true;
         // profile length
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].disabled= true;
-        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].value=true;
-        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI}`)[0].value= true;
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].disabled=true;
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI}`)[0].disabled= true;
     }
 
     function doorjambValueChange(e) {
@@ -478,7 +490,7 @@
         const profileBatch = parseInt(profileIndex/7)+1;
         const newValue = e.target.value;
         doorDependencyGraph[profileIndex%7].forEach(i => {
-                $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${7*(profileBatch-1)+i}`)[0].value = newValue - (profileIndex == 2 ? WIDTH_DIFFERENCE : HEIGHT_DIFFERENCE);
+                $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${7*(profileBatch-1)+i}`)[0].value = newValue - (profileIndex == 2 ? WIDTH_DIFFERENCE : HEIGHT_DIFFERENCE_ON_RUG);
         });
         //additional height update
         const similarProfileIndex = doorjambDependency[profileIndex%7];
@@ -658,10 +670,10 @@
                 Adauga usa
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX --> <b>sub</b> mocheta</a>
-                <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX, true)">DX --> <b>pe</b> mocheta </a>
-                <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX)">SX --> <b>sub</b> mocheta</a>
-                <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX, true)">SX --> <b>pe</b> mocheta </a>
+                <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX -->pe <b>pardoseala</b></a>
+                <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX, true)">DX -->pe <b>mocheta</b></a>
+                <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX)">SX --> pe <b>mocheta</b></a>
+                <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX, true)">SX -->pe <b>pardoseala</b></a>
             </div>
             </td>
         </tr>
