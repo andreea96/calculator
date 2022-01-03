@@ -149,6 +149,7 @@
     const WIDTH_DIFFERENCE = 79;
     const HEIGHT_DIFFERENCE_ON_RUG = 52;
     const RUG_LENGTH=7;
+    var selectedDxfs =[];
 
     window.onload = (event) => {
         //append door jamb selection options
@@ -163,21 +164,16 @@
 
     };
 
-    $(function(){
-        $('#exampleModal').on('show.bs.modal', function (e) {
-            let selectedDxfs =[];
-            $('#modal-body').innerHTML='';
-            for(let i=1;i<=door_inputs;i++) {
-                const dxf = $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${i}`)[0].value;
-                if(!selectedDxfs[dxf]){
-                    $('#modal-body').append(`Lungime bara ${dxf}: <input class="door_bar_length _dxf${dxf}_dxf" type="text" onkeydown="return validate(event,this)"/> mm <br /><br />`);
-                }
-                selectedDxfs[dxf]=true;
-            }
-        });
-    });
-
     function openLengthsModal() {
+
+        $('#modal-body').innerHTML='';
+        for(let i=1;i<=door_inputs;i++) {
+            const dxf = $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${i}`)[0].value;
+            if(!selectedDxfs[dxf]){
+                $('#modal-body').append(`Lungime bara ${dxf}: <input class="door_bar_length _dxf${dxf}_dxf" type="text" onkeydown="return validate(event,this)"/> mm <br /><br />`);
+            }
+            selectedDxfs[dxf]=true;
+        }
         $('#exampleModal').modal('show');
     }
 
@@ -314,6 +310,7 @@
 
     function calculateDoorResult() {
         $('#exampleModal').modal('hide');
+        deletePreviousDoorRows();
         let lengthObjArr = {};
         //add doors
         for (var i = 1; i <= door_inputs; i++) {
@@ -402,15 +399,22 @@
                 });
             };
             showDoorResults(results, barLengthObject.barLength, barLengthObject.profileMat);
-            buildDataTable(results, barLengthObject.barLength);
+            buildDataTable(results, barLengthObject.barLength, 'datatable-door', false);
         }
+        location.hash = "#door-results";
     }
 
-    function buildDataTable(results, barLength) {
+    function deletePreviousDoorRows() {
+        $(`table tr.datatable-door`).remove();
+        $('#door-results').empty();
+    }
+
+    function buildDataTable(results, barLength, datatable='datatable', shouldDeletePreviousRows= true) {
         const table = document.getElementById('datatable');
-        while (table.rows.length > 1) {
-            table.deleteRow(1);
-        }
+        // while (table.rows.length > 1) {
+        //     table.deleteRow(1);
+        // }
+        shouldDeletePreviousRows && $(`table tr.${datatable}`).remove();
         let i = 1;
         let bars = [];
         const convertAngle = (angle) => {
@@ -421,6 +425,7 @@
         bars = results.map(result => result.barResultingPieces).flat();
         bars.forEach(bar => {
             const row = table.insertRow(i);
+            row.className = datatable;
             row.insertCell(0).innerText = '1';
             row.insertCell(1).innerText = (new Date()).getFullYear();
             row.insertCell(2).innerText = $('#project_name').val();
@@ -459,16 +464,13 @@
         const doorJambSelectionValue = $('#door_jamb_selection')[0].value;
         const doorSashSelectionValue = $('#door_sash_selection')[0].value;
         //add profiles
-        for(let i=1;i<=doorPieces;i++) {
-            addDoorJamb(doorType, isOnRug, doorJambSelectionValue, doorHeight, doorWidth);
-            if(doorSashSelectionValue !== NO_SASH) {
-                addSash(doorType, isOnRug, doorWidth, doorHeight);
-            }
+        addDoorJamb(doorType, isOnRug, doorJambSelectionValue, doorHeight, doorWidth, doorPieces);
+        if(doorSashSelectionValue !== NO_SASH) {
+            addSash(doorType, isOnRug, doorWidth, doorHeight, doorPieces);
         }
-
     }
     
-    function addSash(doorType = DOOR_TYPE.DX, isOnRug = false, doorWidth, doorHeight) {
+    function addSash(doorType = DOOR_TYPE.DX, isOnRug = false, doorWidth, doorHeight, amount=1) {
         const sashParts = [
             {
                 name: doorType === DOOR_TYPE.DX ? 'iala' : 'balama',
@@ -500,6 +502,8 @@
             $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = `${doorType}_cercevea_${name}`;
             //length
             $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].value= length;
+            //amount--number of pieces
+            $(`.${CLASS_NAME_NO}${INPUT_TYPE.DOOR}${profileI}`)[0].value= amount;
 
             //disable
             //select
@@ -512,7 +516,7 @@
             $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].disabled=true;
         });
     }
-    function addDoorJamb(doorType, isOnRug, profileDXF, doorHeight, doorWidth) {
+    function addDoorJamb(doorType, isOnRug, profileDXF, doorHeight, doorWidth, amount=1) {
         const lockI = (++door_inputs);
         var lockHtml = getInput(INPUT_TYPE.DOOR, door_inputs);
         const supPartI = (++door_inputs);
@@ -546,6 +550,12 @@
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].value= doorHeight;
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = doorWidth;
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI}`)[0].value=  doorHeight;
+
+        //amount -- number of pieces
+        $(`.${CLASS_NAME_NO}${INPUT_TYPE.DOOR}${lockI}`)[0].value= amount;
+        $(`.${CLASS_NAME_NO}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = amount;
+        $(`.${CLASS_NAME_NO}${INPUT_TYPE.DOOR}${hingeI}`)[0].value=  amount;
+
         //add event listener
         // $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].addEventListener('input', doorjambValueChange);
         // $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].addEventListener('input', doorjambValueChange);
@@ -803,7 +813,7 @@
                 <th>Cercevea</th>
             </tr>
             <tr>
-                <td><input id="door_pieces" type="text"  value="1" /></td>
+                <td><input id="door_pieces" type="text"  value="1" onClick="this.select();"/></td>
                 <td><input id="door_width" type="text"/></td>
                 <td><input id="door_height" type="text"/></td>
                 <td><select id="door_jamb_selection" type="text"></select></td>
