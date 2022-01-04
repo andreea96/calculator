@@ -460,17 +460,18 @@
         //fetch values
         const doorWidth = Number($('#door_width')[0].value);
         const doorHeight = Number($('#door_height')[0].value);
+        const doorCode = $('#door_code')[0].value;
         const doorPieces = Number($('#door_pieces')[0].value);
         const doorJambSelectionValue = $('#door_jamb_selection')[0].value;
         const doorSashSelectionValue = $('#door_sash_selection')[0].value;
         //add profiles
-        addDoorJamb(doorType, isOnRug, doorJambSelectionValue, doorHeight, doorWidth, doorPieces);
+        addDoorJamb(doorType, isOnRug, doorJambSelectionValue, doorHeight, doorWidth, doorCode,  doorPieces);
         if(doorSashSelectionValue !== NO_SASH) {
-            addSash(doorType, isOnRug, doorWidth, doorHeight, doorPieces);
+            addSash(doorType, isOnRug, doorWidth, doorHeight, doorCode, doorPieces);
         }
     }
     
-    function addSash(doorType = DOOR_TYPE.DX, isOnRug = false, doorWidth, doorHeight, amount=1) {
+    function addSash(doorType = DOOR_TYPE.DX, isOnRug = false, doorWidth, doorHeight, doorCode, amount=1) {
         const sashParts = [
             {
                 name: doorType === DOOR_TYPE.DX ? 'iala' : 'balama',
@@ -499,7 +500,7 @@
             //right angle
             $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${profileI}`)[0].value = 45;
             //name
-            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = `${doorType}_cercevea_${name}`;
+            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = `${doorType}_cercevea_${name}_${doorCode}`;
             //length
             $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].value= length;
             //amount--number of pieces
@@ -516,7 +517,7 @@
             $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].disabled=true;
         });
     }
-    function addDoorJamb(doorType, isOnRug, profileDXF, doorHeight, doorWidth, amount=1) {
+    function addDoorJamb(doorType, isOnRug, profileDXF, doorHeight, doorWidth, doorCode, amount=1) {
         const lockI = (++door_inputs);
         var lockHtml = getInput(INPUT_TYPE.DOOR, door_inputs);
         const supPartI = (++door_inputs);
@@ -543,9 +544,9 @@
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = 45;
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = 45;
         //names
-        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${lockI}`)[0].value = `${doorType}_${doorType === DOOR_TYPE.DX? 'iala' : 'balama'}`;
-        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = `${doorType}_partea_superioara`;
-        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = `${doorType}_${doorType === DOOR_TYPE.DX? 'balama' : 'iala'}`;
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${lockI}`)[0].value = `${doorType}_${doorType === DOOR_TYPE.DX? 'iala' : 'balama'}_${doorCode}`;
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = `${doorType}_partea_superioara_${doorCode}`;
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = `${doorType}_${doorType === DOOR_TYPE.DX? 'balama' : 'iala'}_${doorCode}`;
         //length
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].value= doorHeight;
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = doorWidth;
@@ -807,6 +808,7 @@
         <table>
             <tr>
                 <th>Bucati</th>
+                <th>Cod usa</th>
                 <th>Latime usa</th>
                 <th>Inaltime usa</th>
                 <th>Toc</th>
@@ -814,6 +816,7 @@
             </tr>
             <tr>
                 <td><input id="door_pieces" type="text"  value="1" onClick="this.select();"/></td>
+                <td><input id="door_code" type="text" /></td>
                 <td><input id="door_width" type="text"/></td>
                 <td><input id="door_height" type="text"/></td>
                 <td><select id="door_jamb_selection" type="text"></select></td>
