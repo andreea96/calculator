@@ -204,9 +204,6 @@
                 $(`.${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`)[0].value = 62.9;
                 $(`.${CLASS_NAME_PROFILE_WIDTH}${type}${i}`)[0].value = 47.6;
                 break;
-            default:
-                $(`.${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`)[0].value = "";
-                $(`.${CLASS_NAME_PROFILE_WIDTH}${type}${i}`)[0].value = "";
         }
     }
 
@@ -673,7 +670,7 @@
                 <th>Cod profil</th>
              </tr>
              <tr>
-                <td><input class="${CLASS_NAME_PROFILE_CODE}${profileType}${inputs}" type="text" size="100" /></td>
+                <td><input class="${CLASS_NAME_PROFILE_CODE}${profileType}${inputs}" type="text" size="100" onClick="this.select();" /></td>
              </tr>
             </table>
             <table>
@@ -684,9 +681,9 @@
                 <th>Material (dxf)</th>
             </tr>
             <tr>
-              <td><input class="${CLASS_NAME_PROFILE_COLOR}${profileType}${inputs}" type="text"  value="anodizat" id="color"/></td>
-                <td><input class="${CLASS_NAME_PROFILE_HEIGHT}${profileType}${inputs}" type="text" id="height"/></td>
-                <td><input class="${CLASS_NAME_PROFILE_WIDTH}${profileType}${inputs}" type="text"  id="width"/></td>
+              <td><input class="${CLASS_NAME_PROFILE_COLOR}${profileType}${inputs}" type="text"  value="anodizat" id="color" onClick="this.select();"/></td>
+                <td><input class="${CLASS_NAME_PROFILE_HEIGHT}${profileType}${inputs}" type="text" id="height" onClick="this.select();"/></td>
+                <td><input class="${CLASS_NAME_PROFILE_WIDTH}${profileType}${inputs}" type="text"  id="width" onClick="this.select();"/></td>
                 <td>
                     <input type="text" name="mat" list="mat_names" onchange="changeProfileLengthValues( ${functionInputs}, '${profileType}', this.value)" class="${CLASS_NAME_PROFILE_MAT}${profileType}${inputs} ${CLASS_NAME_PROFILE_MAT}">
                     <datalist id="mat_names"  >${dxfOptions}</datalist>
@@ -700,7 +697,7 @@
                 -----
              <select id="profileTypeRight${inputs}" name="profileTypeRight" class="${CLASS_NAME_PROFILE_TYPE_RIGHT}${profileType}${inputs}">${profileTypeOptions}</select>
              |
-             <input class="${classNameLength}" type="text" onkeydown="return validate(event, this)" name="pieceLength"/> mm
+             <input class="${classNameLength}" type="text" onkeydown="return validate(event, this)" onClick="this.select();" name="pieceLength"/> mm
             <hr> `;
 
         return pieceInput;
@@ -805,7 +802,7 @@
 <!--        profile usi-->
         <button onclick="openLengthsModal()">Calculeaza rezultat</button>
         <br/> <br/>
-        <table>
+        <table style="background-color: indianred">
             <tr>
                 <th>Bucati</th>
                 <th>Cod usa</th>
@@ -816,9 +813,9 @@
             </tr>
             <tr>
                 <td><input id="door_pieces" type="text"  value="1" onClick="this.select();"/></td>
-                <td><input id="door_code" type="text" /></td>
-                <td><input id="door_width" type="text"/></td>
-                <td><input id="door_height" type="text"/></td>
+                <td><input id="door_code" type="text" onClick="this.select();"/></td>
+                <td><input id="door_width" type="text" onClick="this.select();"/></td>
+                <td><input id="door_height" type="text" onClick="this.select();"/></td>
                 <td><select id="door_jamb_selection" type="text"></select></td>
                 <td><select id="door_sash_selection"></select></td>
                 <td>
@@ -832,6 +829,15 @@
                         <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX, true)">SX -->pe <b>pardoseala</b></a>
                     </div>
                 </td>
+            </tr>
+            <tr>
+                <td>&nbsp; </td>
+                <td>&nbsp; </td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
             </tr>
         </table>
         <br />
