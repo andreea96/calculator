@@ -104,6 +104,7 @@
     var inputs = 0;
     var door_inputs = 0;
     var globalLengths = [];
+    const doorCodes = [];
     const PROFILE_MATERIALS = {
         DXF_2V: 'Profil 2 Vision.dxf',
         DXF_2V2019: 'Profil 2 Vision 2019.dxf',
@@ -437,14 +438,14 @@
             row.insertCell(11).innerText = '';
             row.insertCell(12).innerText = barLength;
             row.insertCell(13).innerText = bar.nrPieces;
-            row.insertCell(14).innerText = 'toc2670 900';
+            row.insertCell(14).innerText =  datatable === 'datatable-door' ? doorCodes[bar.profileCode] : bar.profileCode;
             row.insertCell(15).innerText = bar.lengthPieces;
             row.insertCell(16).innerText = convertAngle(bar.profileTypeL);
             row.insertCell(17).innerText = convertAngle(bar.profileTypeR);
             row.insertCell(18).innerText = '';
             row.insertCell(19).innerText = '';
             row.insertCell(20).innerText = '';
-            row.insertCell(21).innerText = bar.profileCode;
+            row.insertCell(21).innerText = datatable === 'datatable-door' ? bar.profileCode.replace('_'+doorCodes[bar.profileCode], "") : bar.profileCode;
             row.insertCell(22).innerText = 'OMIFA';
             row.insertCell(23).innerText = '';
             row.insertCell(24).innerText = '';
@@ -497,7 +498,9 @@
             //right angle
             $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${profileI}`)[0].value = 45;
             //name
-            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = `${doorType}_cercevea_${name}_${doorCode}`;
+            const code = `${doorType}_cercevea_${name}_${doorCode}`;
+            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = code;
+            doorCodes[code] = doorCode;
             //length
             $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI}`)[0].value= length;
             //amount--number of pieces
@@ -540,10 +543,18 @@
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${lockI}`)[0].value = 90;
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = 45;
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = 45;
+        // doorCodes
+        const code1 =  `${doorType}_${doorType === DOOR_TYPE.DX? 'iala' : 'balama'}_${doorCode}`;
+        const code2 =  `${doorType}_partea_superioara_${doorCode}`;
+        const code3 =  `${doorType}_${doorType === DOOR_TYPE.DX? 'balama' : 'iala'}_${doorCode}`;
+        doorCodes[code1] = doorCode;
+        doorCodes[code2] = doorCode;
+        doorCodes[code3] = doorCode;
         //names
-        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${lockI}`)[0].value = `${doorType}_${doorType === DOOR_TYPE.DX? 'iala' : 'balama'}_${doorCode}`;
-        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = `${doorType}_partea_superioara_${doorCode}`;
-        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = `${doorType}_${doorType === DOOR_TYPE.DX? 'balama' : 'iala'}_${doorCode}`;
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${lockI}`)[0].value = code1;
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = code2;
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${hingeI}`)[0].value = code3;
+
         //length
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI}`)[0].value= doorHeight;
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI}`)[0].value = doorWidth;
