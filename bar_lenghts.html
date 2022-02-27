@@ -615,7 +615,7 @@
     }
 
     function showResults(resultsArray, barLength) {
-        let text = `Bari de ${barLength} necesare: <b>${resultsArray.length}</b> <br />`;
+        let text = `Bari de ${barLength} necesare: <b id="bars_no_result">${resultsArray.length}</b> <br />`;
         $('#results').empty().append(text);
         text = ``;
         resultsArray.forEach((resultItem, index) => {
@@ -807,7 +807,7 @@
         <label for="length">Lungime bara</label>
         <input class="bar_length" type="text" onkeydown="return validate(event,this)"/> mm
         <br/> <br/>
-        <button onclick="calculateResult()">Calculeaza rezultat</button> &nbsp; &nbsp;
+        <button onclick="calculateResult()" id='custom_result_calculate'>Calculeaza rezultat</button> &nbsp; &nbsp;
         <br/><br/>
         <table style="background-color: indianred">
             <tr>
