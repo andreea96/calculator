@@ -119,6 +119,10 @@
         DXF_LEAF_PROFILE: 'Leaf profile GSW Office Plus.dxf',
         DXF_LUCE: 'luce.dxf',
         DXF_2V_BIGCERCEVEA: '2vision_big_cercevea.dxf',
+        DXF_KWI: 'KWI.dxf',
+        DXF_SKY_CU_CAPAC: 'SKY CU CAPAC.dxf',
+        DXF_SKY_FARA_CAPAC: 'SKY FARA CAPAC.dxf',
+
     };
     const DOOR_TYPE = {
         SX: 'SX',
@@ -207,6 +211,15 @@
             case PROFILE_MATERIALS.DXF_2V_BIGCERCEVEA:
                 $(`.${heightIdentifier}`)[0].value = 62.9;
                 $(`.${widthIdentifier}`)[0].value = 47.6;
+                break;
+            case PROFILE_MATERIALS.DXF_KWI:
+                $(`.${heightIdentifier}`)[0].value = 35;
+                $(`.${widthIdentifier}`)[0].value = 19;
+                break;
+            case PROFILE_MATERIALS.DXF_SKY_CU_CAPAC:
+            case PROFILE_MATERIALS.DXF_SKY_FARA_CAPAC:
+                $(`.${heightIdentifier}`)[0].value = 30;
+                $(`.${widthIdentifier}`)[0].value = 24;
                 break;
         }
     }
@@ -680,6 +693,9 @@
             <option value="luce.dxf">luce.dxf</option>
             <option value="Profil 2 Vision 2019.dxf">Profil 2 Vision 2019.dxf</option>
             <option value="2vision_big_cercevea.dxf">2vision_big_cercevea.dxf</option>
+            <option value="KWI.dxf">KWI.dxf</option>
+            <option value="SKY CU CAPAC.dxf">SKY CU CAPAC.dxf</option>
+            <option value="SKY FARA CAPAC.dxf">SKY FARA CAPAC.dxf</option>
         `;
         var  profileTypeOptions =
             `<option value="90">90</option>
@@ -856,6 +872,9 @@
                         <option value="luce.dxf">luce.dxf</option>
                         <option value="Profil 2 Vision 2019.dxf">Profil 2 Vision 2019.dxf</option>
                         <option value="2vision_big_cercevea.dxf">2vision_big_cercevea.dxf</option>
+                        <option value="KWI.dxf">KWI.dxf</option>
+                        <option value="SKY CU CAPAC.dxf">SKY CU CAPAC.dxf</option>
+                        <option value="SKY FARA CAPAC.dxf">SKY FARA CAPAC.dxf</option>
                     </datalist>
                 </td>
                 <td><button name="add_custom_pieces" onclick="addInput()">Adauga bucati dorite</button></td>
@@ -911,9 +930,8 @@
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX -->pe <b>pardoseala</b></a>
                         <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX, true)">DX -->pe <b>mocheta</b></a>
-                        <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX)">SX --> pe <b>mocheta</b></a>
-                        <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX, true)">SX -->pe
-                            <b>pardoseala</b></a>
+                        <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX)">SX --> pe <b>pardoseala</b></a>
+                        <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX, true)">SX -->pe <b>mocheta</b></a>
                     </div>
                 </td>
             </tr>
