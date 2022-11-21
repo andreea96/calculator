@@ -169,11 +169,12 @@
 
     };
 
-    function openLengthsModal() {
-
+    function openLengthsModal(isDoor = true) {
+        let inputType = isDoor ?  INPUT_TYPE.DOOR : INPUT_TYPE.CUSTOM;
+        const inputsTypes  = isDoor ? door_inputs : inputs;
         $('#modal-body').innerHTML = '';
-        for (let i = 1; i <= door_inputs; i++) {
-            const dxf = $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${i}`)[0].value;
+        for (let i = 1; i <= inputsTypes; i++) {
+            const dxf = $(`.${CLASS_NAME_PROFILE_MAT}${inputType}${i}`)[0].value;
             if (!selectedDxfs[dxf]) {
                 $('#modal-body').append(`Lungime bara ${dxf}: <input class="door_bar_length _dxf${dxf}_dxf" type="text" onkeydown="return validate(event,this)"/> mm <br /><br />`);
             }
@@ -322,21 +323,25 @@
         globalResults = results;
     }
 
-    function calculateDoorResult() {
+    function calculateDoorResult(isDoor = true) {
         $('#exampleModal').modal('hide');
-        deletePreviousDoorRows();
+        if(isDoor){
+            deletePreviousDoorRows();
+        }
         let lengthObjArr = {};
+        let inputType = isDoor ? INPUT_TYPE.DOOR : INPUT_TYPE.CUSTOM;
+        let inputsTypes = isDoor ? door_inputs : inputs;
         //add doors
-        for (var i = 1; i <= door_inputs; i++) {
-            let length = parseInt($(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${i}`)[0].value);
-            let noLengths = parseInt($(`.${CLASS_NAME_NO}${INPUT_TYPE.DOOR}${i}`)[0].value);
-            let profileTypeL = $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.DOOR}${i}`)[0].value;
-            let profileTypeR = $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${i}`)[0].value;
-            let profileCode = $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${i}`)[0].value;
-            let profileColor = $(`.${CLASS_NAME_PROFILE_COLOR}${INPUT_TYPE.DOOR}${i}`)[0].value;
-            let profileWidth = $(`.${CLASS_NAME_PROFILE_WIDTH}${INPUT_TYPE.DOOR}${i}`)[0].value;
-            let profileHeight = $(`.${CLASS_NAME_PROFILE_HEIGHT}${INPUT_TYPE.DOOR}${i}`)[0].value;
-            let profileMat = $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${i}`)[0].value;
+        for (var i = 1; i <= inputsTypes; i++) {
+            let length = parseInt($(`.${CLASS_NAME_LENGTH}${inputType}${i}`)[0].value);
+            let noLengths = parseInt($(`.${CLASS_NAME_NO}${inputType}${i}`)[0].value);
+            let profileTypeL = $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${inputType}${i}`)[0].value;
+            let profileTypeR = $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${inputType}${i}`)[0].value;
+            let profileCode = $(`.${CLASS_NAME_PROFILE_CODE}${inputType}${i}`)[0].value;
+            let profileColor = $(`.${CLASS_NAME_PROFILE_COLOR}${inputType}${i}`)[0].value;
+            let profileWidth = $(`.${CLASS_NAME_PROFILE_WIDTH}${inputType}${i}`)[0].value;
+            let profileHeight = $(`.${CLASS_NAME_PROFILE_HEIGHT}${inputType}${i}`)[0].value;
+            let profileMat = $(`.${CLASS_NAME_PROFILE_MAT}${inputType}${i}`)[0].value;
 
             if (!isNaN(noLengths) && !isNaN(length)) {
                 if (!lengthObjArr[profileMat]) lengthObjArr[profileMat] = [];
@@ -413,10 +418,12 @@
                 });
             }
             ;
-            showDoorResults(results, barLengthObject.barLength, barLengthObject.profileMat);
-            buildDataTable(results, barLengthObject.barLength, 'datatable-door', false);
+            showDoorResults(results, barLengthObject.barLength, barLengthObject.profileMat, isDoor);
+            isDoor
+                ? buildDataTable(results, barLengthObject.barLength, 'datatable-door', false)
+                : buildDataTable(results, barLengthObject.barLength, 'datatable', false);
         }
-        location.hash = "#door-results";
+        if(isDoor) location.hash = "#door-results";
     }
 
     function deletePreviousDoorRows() {
@@ -426,9 +433,6 @@
 
     function buildDataTable(results, barLength, datatable = 'datatable', shouldDeletePreviousRows = true) {
         const table = document.getElementById('datatable');
-        // while (table.rows.length > 1) {
-        //     table.deleteRow(1);
-        // }
         shouldDeletePreviousRows && $(`table tr.${datatable}`).remove();
         let i = 1;
         let bars = [];
@@ -651,9 +655,10 @@
         $('#results').append(text);
     }
 
-    function showDoorResults(resultsArray, barLength, barMat) {
+    function showDoorResults(resultsArray, barLength, barMat, isDoor = true) {
+        let divResultIdentifier =isDoor ? '#door-results' : '#results';
         let text = `Bari de ${barLength} / <b> ${barMat}</b> necesare: <b>${resultsArray.length}</b><br />`;
-        $('#door-results').append(text);
+        $(divResultIdentifier).append(text);
         text = ``;
         resultsArray.forEach((resultItem, index) => {
             text += `<hr class="result">`
@@ -672,7 +677,7 @@
             text += `Ramas din bara: ${resultItem.barRest} <br /> <hr>`;
         });
 
-        $('#door-results').append(text);
+        $(divResultIdentifier).append(text);
     }
 
     function getInput(profileType, inputs) {
@@ -820,10 +825,7 @@
     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
         <br/><br/>
         <!--        profile custom-->
-        <label for="length">Lungime bara</label>
-        <input class="bar_length" type="text" onkeydown="return validate(event,this)"/> mm
-        <br/> <br/>
-        <button onclick="calculateResult()" id='custom_result_calculate'>Calculeaza rezultat</button> &nbsp; &nbsp;
+        <button onclick="openLengthsModal(false)" id='custom_result_calculate'>Calculeaza rezultat</button> &nbsp; &nbsp;
         <br/><br/>
         <table style="background-color: indianred">
             <tr>
@@ -996,7 +998,7 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="calculateDoorResult()">Calculeaza rezultat
+                <button type="button" class="btn btn-primary" onclick="calculateDoorResult(false)">Calculeaza rezultat
                 </button>
             </div>
         </div>
