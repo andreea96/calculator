@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Optimum cuts</title>
@@ -87,7 +88,7 @@
     }
 </style>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
 <script>
     const CLASS_NAME_NO = 'no_input_';
@@ -106,15 +107,14 @@
     var globalLengths = [];
     const doorCodes = [];
     const PROFILE_MATERIALS = {
-        DXF_2V: 'Profil 2 Vision.dxf',
         DXF_2V2019: 'Profil 2 Vision 2019.dxf',
+        DXF_SINGLE_OMIFA_U: 'Single Omifa U.dxf',
+        DXF_SINGLE_OMIFA_L: 'Single Omifa L.dxf',
         DXF_ALUTEC: 'Profil Alutec 18.5x32 standard.dxf',
-        BAK_ECO: 'Profil ECO.bak',
         DXF_ECO: 'Profil ECO.dxf',
         DXF_H2V: 'Profil H 2 Vision.dxf',
         DXF_SIMAX: 'simax_aripa_cercevea.dxf',
         DXF_TOC_2V2019: 'Toc 2 Vision 2019.dxf',
-        DXF_TOC_2V: 'Toc 2 Vision.dxf',
         DXF_TOC_SINGLEV2019: 'Toc Single VISION 2019.dxf',
         DXF_LEAF_PROFILE: 'Leaf profile GSW Office Plus.dxf',
         DXF_LUCE: 'luce.dxf',
@@ -171,10 +171,10 @@
     };
 
     function openLengthsModal(isDoor = true) {
-        let inputType = isDoor ?  INPUT_TYPE.DOOR : INPUT_TYPE.CUSTOM;
-        const inputsTypes  = isDoor ? door_inputs : inputs;
+        let inputType = isDoor ? INPUT_TYPE.DOOR : INPUT_TYPE.CUSTOM;
+        const inputsTypes = isDoor ? door_inputs : inputs;
         const modalBodyTag = isDoor ? '#door-modal-body' : '#modal-body';
-        const currentSelectedDxfs = isDoor ? doorSelectedDxfs :  selectedDxfs;
+        const currentSelectedDxfs = isDoor ? doorSelectedDxfs : selectedDxfs;
         $(modalBodyTag).innerHTML = '';
         for (let i = 1; i <= inputsTypes; i++) {
             const dxf = $(`.${CLASS_NAME_PROFILE_MAT}${inputType}${i}`)[0].value;
@@ -188,8 +188,8 @@
     }
 
     function changeProfileLengthValues(i, type, option) {
-        const heightIdentifier = i===-1 ? 'custom_height' : `${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`;
-        const widthIdentifier = i===-1 ?'custom_width' : `${CLASS_NAME_PROFILE_WIDTH}${type}${i}`;
+        const heightIdentifier = i === -1 ? 'custom_height' : `${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`;
+        const widthIdentifier = i === -1 ? 'custom_width' : `${CLASS_NAME_PROFILE_WIDTH}${type}${i}`;
 
         switch (option) {
             case PROFILE_MATERIALS.DXF_LUCE:
@@ -200,7 +200,6 @@
                 $(`.${heightIdentifier}`)[0].value = 50;
                 $(`.${widthIdentifier}`)[0].value = 55.2;
                 break;
-            case PROFILE_MATERIALS.DXF_2V:
             case PROFILE_MATERIALS.DXF_TOC_2V2019:
                 $(`.${heightIdentifier}`)[0].value = 50;
                 $(`.${widthIdentifier}`)[0].value = 100;
@@ -225,6 +224,11 @@
             case PROFILE_MATERIALS.DXF_SKY_FARA_CAPAC:
                 $(`.${heightIdentifier}`)[0].value = 24;
                 $(`.${widthIdentifier}`)[0].value = 30;
+                break;
+            case PROFILE_MATERIALS.DXF_SINGLE_OMIFA_L:
+            case PROFILE_MATERIALS.DXF_SINGLE_OMIFA_U:
+                $(`.${heightIdentifier}`)[0].value = 24;
+                $(`.${widthIdentifier}`)[0].value = 35;
                 break;
         }
     }
@@ -279,16 +283,16 @@
             let barRest = barLength;
             let barResultingPieces = [];
             lengthsArr.forEach(({
-                                    length,
-                                    noLengths,
-                                    profileTypeL,
-                                    profileTypeR,
-                                    profileCode,
-                                    profileColor,
-                                    profileHeight,
-                                    profileWidth,
-                                    profileMat
-                                }, index) => {
+                length,
+                noLengths,
+                profileTypeL,
+                profileTypeR,
+                profileCode,
+                profileColor,
+                profileHeight,
+                profileWidth,
+                profileMat
+            }, index) => {
                 let cutsMade = 0;
                 let potentialCuts = parseInt(barRest / (length + BAR_CUT_WASTE));
                 potentialCuts = potentialCuts <= noLengths
@@ -317,7 +321,7 @@
                     });
                 }
             }, lengthsArr)
-            results.push({barRest, barResultingPieces});
+            results.push({ barRest, barResultingPieces });
             lengthsArr = lengthsArr.filter((value, index, array) => {
                 return (value.noLengths !== 0);
             });
@@ -330,7 +334,7 @@
     function calculateDoorResult(isDoor = true) {
         const isDoorModalTag = isDoor ? '#doorModal' : '#exampleModal';
         $(isDoorModalTag).modal('hide');
-        if(isDoor){
+        if (isDoor) {
             deletePreviousDoorRows();
         }
         let lengthObjArr = {};
@@ -367,7 +371,7 @@
         let results = [];
         let barsLengths = [];
         $(`.door_bar_length`).toArray().forEach(input => {
-            barsLengths.push({barLength: Number(input.value), profileMat: input.className.split('_dxf')[1]});
+            barsLengths.push({ barLength: Number(input.value), profileMat: input.className.split('_dxf')[1] });
         });
 
         for (let barLengthObject of barsLengths) {
@@ -379,16 +383,16 @@
                 let barRest = barLengthObject.barLength;
                 let barResultingPieces = [];
                 lengthsArr.forEach(({
-                                        length,
-                                        noLengths,
-                                        profileTypeL,
-                                        profileTypeR,
-                                        profileCode,
-                                        profileColor,
-                                        profileHeight,
-                                        profileWidth,
-                                        profileMat
-                                    }, index) => {
+                    length,
+                    noLengths,
+                    profileTypeL,
+                    profileTypeR,
+                    profileCode,
+                    profileColor,
+                    profileHeight,
+                    profileWidth,
+                    profileMat
+                }, index) => {
                     let cutsMade = 0;
                     let potentialCuts = parseInt(barRest / (length + BAR_CUT_WASTE));
                     potentialCuts = potentialCuts <= noLengths
@@ -417,7 +421,7 @@
                         });
                     }
                 }, lengthsArr)
-                results.push({barRest, barResultingPieces});
+                results.push({ barRest, barResultingPieces });
                 lengthsArr = lengthsArr.filter((value, index, array) => {
                     return (value.noLengths !== 0);
                 });
@@ -428,7 +432,7 @@
                 ? buildDataTable(results, barLengthObject.barLength, 'datatable-door', false)
                 : buildDataTable(results, barLengthObject.barLength, 'datatable', false);
         }
-        if(isDoor) location.hash = "#door-results";
+        if (isDoor) location.hash = "#door-results";
     }
 
     function deletePreviousDoorRows() {
@@ -512,7 +516,7 @@
                 length: doorWidth - WIDTH_DIFFERENCE
             },
         ]
-        sashParts.map(({length, name}, i) => {
+        sashParts.map(({ length, name }, i) => {
             const profileI = ++door_inputs;
             const profileHtml = `<div class="sash"}>${getInput(INPUT_TYPE.DOOR, door_inputs)}</div>`;
             $("#door-pieces").append(profileHtml);
@@ -644,12 +648,12 @@
             text += `<hr class="result">`
             text += `Bara ${index + 1}:<ul>`;
             resultItem.barResultingPieces.forEach(({
-                                                       nrPieces,
-                                                       lengthPieces,
-                                                       profileTypeL,
-                                                       profileTypeR,
-                                                       profileCode
-                                                   }) => {
+                nrPieces,
+                lengthPieces,
+                profileTypeL,
+                profileTypeR,
+                profileCode
+            }) => {
                 let type = nrPieces === 1 ? `bucata` : `bucati`;
                 text += `<li>${nrPieces} ${type} de ${lengthPieces} mm | ${profileTypeL} ---- ${profileTypeR} | ${profileCode} </li> `;
             });
@@ -661,7 +665,7 @@
     }
 
     function showDoorResults(resultsArray, barLength, barMat, isDoor = true) {
-        let divResultIdentifier =isDoor ? '#door-results' : '#results';
+        let divResultIdentifier = isDoor ? '#door-results' : '#results';
         let text = `Bari de ${barLength} / <b> ${barMat}</b> necesare: <b>${resultsArray.length}</b><br />`;
         $(divResultIdentifier).append(text);
         text = ``;
@@ -669,12 +673,12 @@
             text += `<hr class="result">`
             text += `Bara ${index + 1}:<ul>`;
             resultItem.barResultingPieces.forEach(({
-                                                       nrPieces,
-                                                       lengthPieces,
-                                                       profileTypeL,
-                                                       profileTypeR,
-                                                       profileCode
-                                                   }) => {
+                nrPieces,
+                lengthPieces,
+                profileTypeL,
+                profileTypeR,
+                profileCode
+            }) => {
                 let type = nrPieces === 1 ? `bucata` : `bucati`;
                 text += `<li>${nrPieces} ${type} de ${lengthPieces} mm | ${profileTypeL} ---- ${profileTypeR} | ${profileCode} </li> `;
             });
@@ -690,14 +694,13 @@
         var classNameNo = `${CLASS_NAME_NO}${profileType}${inputs}`;
         var classNameLength = `${CLASS_NAME_LENGTH}${profileType}${inputs}`;
         var dxfOptions = `
-            <option value="Profil 2 Vision.dxf">Profil 2 Vision.dxf</option>
             <option value="Profil Alutec 18.5x32 standard.dxf">Profil Alutec 18.5x32 standard.dxf</option>
-            <option value="Profil ECO.bak">Profil ECO.bak</option>
+            <option value="Single Omifa U.dxf">Single Omifa U.dxf</option>
+            <option value="Single Omifa L.dxf">Single Omifa L.dxf</option>
             <option value="Profil ECO.dxf">Profil ECO.dxf</option>
             <option value="Profil H 2 Vision.dxf">Profil H 2 Vision.dxf</option>
             <option value="simax_aripa_cercevea.dxf">simax_aripa_cercevea.dxf</option>
             <option value="Toc 2 Vision 2019.dxf">Toc 2 Vision 2019.dxf</option>
-            <option value="Toc 2 Vision.dxf">Toc 2 Vision.dxf</option>
             <option value="Toc Single VISION 2019.dxf">Toc Single VISION 2019.dxf</option>
             <option value="Leaf profile GSW Office Plus.dxf">Leaf profile GSW Office Plus.dxf</option>
             <option value="luce.dxf">luce.dxf</option>
@@ -707,7 +710,7 @@
             <option value="SKY CU CAPAC.dxf">SKY CU CAPAC.dxf</option>
             <option value="SKY FARA CAPAC.dxf">SKY FARA CAPAC.dxf</option>
         `;
-        var  profileTypeOptions =
+        var profileTypeOptions =
             `<option value="90">90</option>
              <option value="45">45</option>
              <option value="135">135</option>
@@ -750,52 +753,52 @@
         inputs++;
         const inputHtml = getInput(INPUT_TYPE.CUSTOM, inputs);
         $("#pieces").append(inputHtml);
-            //selected material
-            var currentSelect = $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.CUSTOM}${inputs}`)[0];
-            currentSelect.value = $('.custom_mat')[0].value;
-            //color
-            $(`.${CLASS_NAME_PROFILE_COLOR}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_color`)[0].value;
-            //height
-            $(`.${CLASS_NAME_PROFILE_HEIGHT}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_height`)[0].value;
-            //width
-            $(`.${CLASS_NAME_PROFILE_WIDTH}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_width`)[0].value;
-            //profile name
-            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_code`)[0].value;
-            //left angle
-            $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_left`)[0].value;
-            //right angle
-            $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_right`)[0].value;
-            //number of pieces
-            $(`.${CLASS_NAME_NO}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_pieces`)[0].value;
-            //length
-            $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_dimension`)[0].value;
+        //selected material
+        var currentSelect = $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.CUSTOM}${inputs}`)[0];
+        currentSelect.value = $('.custom_mat')[0].value;
+        //color
+        $(`.${CLASS_NAME_PROFILE_COLOR}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_color`)[0].value;
+        //height
+        $(`.${CLASS_NAME_PROFILE_HEIGHT}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_height`)[0].value;
+        //width
+        $(`.${CLASS_NAME_PROFILE_WIDTH}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_width`)[0].value;
+        //profile name
+        $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_code`)[0].value;
+        //left angle
+        $(`.${CLASS_NAME_PROFILE_TYPE_LEFT}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_left`)[0].value;
+        //right angle
+        $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_right`)[0].value;
+        //number of pieces
+        $(`.${CLASS_NAME_NO}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_pieces`)[0].value;
+        //length
+        $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_dimension`)[0].value;
     }
 
     function exportToExcel() {
         var elt = document.getElementById('datatable');
-        var wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet1"});
+        var wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet1" });
         return XLSX.writeFile(wb, 'clp_csv_cutting_list_example.xls');
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
-        crossorigin="anonymous"></script>
+    integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+    crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
 <div class="row">
     <div class="col-6">
         <label for="project_name">Nume proiect</label>
         <u><a style="cursor: pointer; color: blue" onclick="exportToExcel()" onmouseover="">Export to Excel</a></u>
-        <br/>
+        <br />
         <textarea name="Text1" cols="60" rows="5" , id="project_name"></textarea>
-        <br/> <br/>
+        <br /> <br />
         <i>*Nota: </i> Lamele taie 8 mm din teava
     </div>
     <div class="col-3">
@@ -805,7 +808,7 @@
         <img src="https://raw.githubusercontent.com/andreea96/calculator/master/cap_dreapta.png" alt="Capat dreapta">
     </div>
 </div>
-<br/>
+<br />
 <div class="row">
     <div class="col-6">
 
@@ -818,20 +821,21 @@
 <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
         <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
-                role="tab" aria-controls="home" aria-selected="true"><b>Profile custom</b></button>
+            role="tab" aria-controls="home" aria-selected="true"><b>Profile custom</b></button>
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
-                role="tab" aria-controls="profile" aria-selected="false"><b>USI</b></button>
+            role="tab" aria-controls="profile" aria-selected="false"><b>USI</b></button>
     </li>
 
 </ul>
 <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-        <br/><br/>
+        <br /><br />
         <!--        profile custom-->
-        <button onclick="openLengthsModal(false)" id='custom_result_calculate'>Calculeaza rezultat</button> &nbsp; &nbsp;
-        <br/><br/>
+        <button onclick="openLengthsModal(false)" id='custom_result_calculate'>Calculeaza rezultat</button> &nbsp;
+        &nbsp;
+        <br /><br />
         <table style="background-color: indianred">
             <tr>
                 <th>Bucati</th>
@@ -847,33 +851,33 @@
                 <th> </th>
             </tr>
             <tr>
-                <td><input id="custom_pieces" type="text" value="1" onClick="this.select();"/></td>
-                <td><input id="custom_code" type="text"  size="50" onClick="this.select();"/></td>
+                <td><input id="custom_pieces" type="text" value="1" onClick="this.select();" /></td>
+                <td><input id="custom_code" type="text" size="50" onClick="this.select();" /></td>
                 <td><select id="custom_left" name="profileTypeLeft">
                         <option value="90">90</option>
                         <option value="45">45</option>
                         <option value="135">135</option>
-                </select></td>
+                    </select></td>
                 <td>----</td>
                 <td><select id="custom_right" name="profileTypeLeft">
                         <option value="90">90</option>
                         <option value="45">45</option>
                         <option value="135">135</option>
-                </select></td>
-                <td><input id="custom_dimension" type="number" onClick="this.select();"/></td>
-                <td><input id="custom_color" type="text" value="anodizat" onClick="this.select();"/></td>
-                <td><input id="custom_height" class="custom_width" type="text" onClick="this.select();"/></td>
-                <td><input id="custom_width" class="custom_height" type="text" onClick="this.select();"/></td>
-                <td><input type="text" name="mat" list="mat_names" onchange="changeProfileLengthValues(-1,'custom', this.value)" class="custom_mat">
+                    </select></td>
+                <td><input id="custom_dimension" type="number" onClick="this.select();" /></td>
+                <td><input id="custom_color" type="text" value="anodizat" onClick="this.select();" /></td>
+                <td><input id="custom_height" class="custom_width" type="text" onClick="this.select();" /></td>
+                <td><input id="custom_width" class="custom_height" type="text" onClick="this.select();" /></td>
+                <td><input type="text" name="mat" list="mat_names"
+                        onchange="changeProfileLengthValues(-1,'custom', this.value)" class="custom_mat">
                     <datalist id="mat_names">
-                        <option value="Profil 2 Vision.dxf">Profil 2 Vision.dxf</option>
                         <option value="Profil Alutec 18.5x32 standard.dxf">Profil Alutec 18.5x32 standard.dxf</option>
-                        <option value="Profil ECO.bak">Profil ECO.bak</option>
+                        <option value="Single Omifa U.dxf">Single Omifa U.dxf</option>
+                        <option value="Single Omifa L.dxf">Single Omifa L.dxf</option>
                         <option value="Profil ECO.dxf">Profil ECO.dxf</option>
                         <option value="Profil H 2 Vision.dxf">Profil H 2 Vision.dxf</option>
                         <option value="simax_aripa_cercevea.dxf">simax_aripa_cercevea.dxf</option>
                         <option value="Toc 2 Vision 2019.dxf">Toc 2 Vision 2019.dxf</option>
-                        <option value="Toc 2 Vision.dxf">Toc 2 Vision.dxf</option>
                         <option value="Toc Single VISION 2019.dxf">Toc Single VISION 2019.dxf</option>
                         <option value="Leaf profile GSW Office Plus.dxf">Leaf profile GSW Office Plus.dxf</option>
                         <option value="luce.dxf">luce.dxf</option>
@@ -907,10 +911,10 @@
         <!--        END profile custom-->
     </div>
     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-        <br/>
+        <br />
         <!--        profile usi-->
         <button onclick="openLengthsModal()">Calculeaza rezultat</button>
-        <br/> <br/>
+        <br /> <br />
         <table style="background-color: indianred">
             <tr>
                 <th>Bucati</th>
@@ -922,23 +926,26 @@
                 <th>Cercevea</th>
             </tr>
             <tr>
-                <td><input id="door_pieces" type="text" value="1" onClick="this.select();"/></td>
-                <td><input id="door_code" type="text" onClick="this.select();"/></td>
-                <td><input id="door_color" type="text" value="anodizat" onClick="this.select();"/></td>
-                <td><input id="door_width" type="text" onClick="this.select();"/></td>
-                <td><input id="door_height" type="text" onClick="this.select();"/></td>
+                <td><input id="door_pieces" type="text" value="1" onClick="this.select();" /></td>
+                <td><input id="door_code" type="text" onClick="this.select();" /></td>
+                <td><input id="door_color" type="text" value="anodizat" onClick="this.select();" /></td>
+                <td><input id="door_width" type="text" onClick="this.select();" /></td>
+                <td><input id="door_height" type="text" onClick="this.select();" /></td>
                 <td><select id="door_jamb_selection" type="text"></select></td>
                 <td><select id="door_sash_selection"></select></td>
                 <td>
                     <button class=" dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
+                        aria-haspopup="true" aria-expanded="false">
                         Adauga usa
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX -->pe <b>pardoseala</b></a>
-                        <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX, true)">DX -->pe <b>mocheta</b></a>
-                        <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX)">SX --> pe <b>pardoseala</b></a>
-                        <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX, true)">SX -->pe <b>mocheta</b></a>
+                        <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX, true)">DX -->pe
+                            <b>mocheta</b></a>
+                        <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX)">SX --> pe
+                            <b>pardoseala</b></a>
+                        <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX, true)">SX -->pe
+                            <b>mocheta</b></a>
                     </div>
                 </td>
             </tr>
@@ -952,7 +959,7 @@
                 <td>&nbsp;</td>
             </tr>
         </table>
-        <br/>
+        <br />
         <div id="door-pieces"></div>
         <div id="door-results"></div>
     </div>
@@ -990,7 +997,7 @@
 </table>
 
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -1010,7 +1017,7 @@
     </div>
 </div>
 <div class="modal fade" id="doorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -1030,4 +1037,5 @@
     </div>
 </div>
 </body>
+
 </html>
