@@ -776,6 +776,10 @@
 
     function exportToExcel() {
         var elt = document.getElementById('datatable');
+        for (let i = 1; i < elt.rows.length; i++) {
+            //overwrite project name in case it changed
+            elt.rows[i].cells[2].innerHTML = $('#project_name').val();
+        }
         var wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet1" });
         return XLSX.writeFile(wb, 'clp_csv_cutting_list_example.xls');
     }
