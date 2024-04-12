@@ -781,7 +781,8 @@
             elt.rows[i].cells[2].innerHTML = $('#project_name').val();
         }
         var wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet1" });
-        return XLSX.writeFile(wb, 'clp_csv_cutting_list_example.xls');
+        const fileName = $('#project_name').val() === "" ? "clp_csv_cutting_list_example" : $('#project_name').val();
+        return XLSX.writeFile(wb, `${fileName}.xls`);
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
