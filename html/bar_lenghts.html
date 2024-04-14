@@ -313,16 +313,6 @@
     var doorSelectedDxfs = [];
 
     window.onload = (event) => {
-        // with translations
-        // //append door jamb selection options
-        // DOORJAMBS.forEach(option => {
-        //     $('#door_jamb_selection').append(`<option data-tr_label="{{${option}}}">${option}</option>`);
-        // });
-        // //append sash selection options
-        // DOORSASHS.forEach(option => {
-        //     $('#door_sash_selection').append(`<option data-tr_label="{{${option}}}">${option}</option>`);
-        // });
-
         DOORJAMBS.forEach(option => {
             $('#door_jamb_selection').append(`<option>${option}</option>`);
         });
@@ -331,14 +321,12 @@
             $('#door_sash_selection').append(`<option>${option}</option>`);
         });
         //no sash option 
-        $('#door_sash_selection').append(`<option data-tr_label="{{${NO_SASH}}}"></option>`);
+        $('#door_sash_selection').append(`<option data-tr_label="${NO_SASH}"></option>`);
 
         Object.keys(LANGUAGES).forEach(option => {
-            $("#lang").append(`<option value=${option} > ${LANGUAGES[option]}</option >`);
+            $("#lang").append(`<option value=${option}>${LANGUAGES[option]}</option >`);
         })
-        console.log($('#custom_color').val());
         $('#custom_color').val(TRANSLATIONS[globalLanguage]['anodized']);
-        console.log($('#custom_color').val());
         translatePage();
     };
 
@@ -346,9 +334,7 @@
         const elementsToTranslate = $(`[data-tr_label`);
         const regex = /\{\{([^}]+)\}\}/g;
         for (let element of elementsToTranslate) {
-            element.innerText = $(element).data('tr_label').replace(/\{\{([^}]+)\}\}/g, function (match, captureGroup) {
-                return TRANSLATIONS[globalLanguage][captureGroup];  // Replace with your desired replacement logic
-            });
+            element.innerText = TRANSLATIONS[globalLanguage][$(element).data('tr_label')];
         }
     }
 
@@ -684,9 +670,10 @@
         const doorSashSelectionValue = $('#door_sash_selection')[0].value;
         //add profiles
         addDoorJamb(doorType, isOnRug, doorJambSelectionValue, doorHeight, doorWidth, doorCode, doorColor, doorPieces);
-        if (doorSashSelectionValue !== NO_SASH) {
+        if (doorSashSelectionValue !== TRANSLATIONS[globalLanguage]['no_sash']) {
             addSash(doorType, isOnRug, doorWidth, doorHeight, doorCode, doorColor, doorPieces);
         }
+        translatePage();
     }
 
     function addSash(doorType = DOOR_TYPE.DX, isOnRug = false, doorWidth, doorHeight, doorCode, doorColor, amount = 1) {
@@ -831,12 +818,12 @@
     }
 
     function showResults(resultsArray, barLength) {
-        let text = `<div data-tr_label="{{profiles_of}}">Bari de </div>${barLength} <div data-tr_label="{{needed}}">necesare</div>: <b id="bars_no_result">${resultsArray.length}</b> <br />`;
+        let text = `<div data-tr_label="profiles_of">Bari de </div>${barLength} <div data-tr_label="needed">necesare</div>: <b id="bars_no_result">${resultsArray.length}</b> <br />`;
         $('#results').empty().append(text);
         text = ``;
         resultsArray.forEach((resultItem, index) => {
             text += `<hr class="result"> `
-            text += `<div data-tr_label="{{profile}}">Bara</div> ${index + 1}: <ul>`;
+            text += `<div data-tr_label="profile">Bara</div> ${index + 1}: <ul>`;
             resultItem.barResultingPieces.forEach(({
                 nrPieces,
                 lengthPieces,
@@ -844,11 +831,11 @@
                 profileTypeR,
                 profileCode
             }) => {
-                let type = nrPieces === 1 ? `<div data-tr_label="{{piece}}">${TRANSLATIONS[globalLanguage]['piece']}</div>` : `<div data-tr_label="{{pieces}}">${TRANSLATIONS[globalLanguage]['pieces']}</div>`;
-                text += `<li>${nrPieces} ${type} <div data-tr_label="{{of}}">${TRANSLATIONS[globalLanguage]['of']}</div> ${lengthPieces} mm | ${profileTypeL} ---- ${profileTypeR} | ${profileCode} </li> `;
+                let type = nrPieces === 1 ? `<div data-tr_label="piece">${TRANSLATIONS[globalLanguage]['piece']}</div>` : `<div data-tr_label="pieces">${TRANSLATIONS[globalLanguage]['pieces']}</div>`;
+                text += `<li>${nrPieces} ${type} <div data-tr_label="of">${TRANSLATIONS[globalLanguage]['of']}</div> ${lengthPieces} mm | ${profileTypeL} ---- ${profileTypeR} | ${profileCode} </li> `;
             });
             text += `</ul>`;
-            text += `<div data-tr_label="{{bar_left_of}}">${TRANSLATIONS[globalLanguage]['bar_left_of']}</div>: ${resultItem.barRest} mm<br />`;
+            text += `<div data-tr_label="bar_left_of">${TRANSLATIONS[globalLanguage]['bar_left_of']}</div>: ${resultItem.barRest} mm<br />`;
         });
 
         $('#results').append(text);
@@ -856,12 +843,12 @@
 
     function showDoorResults(resultsArray, barLength, barMat, isDoor = true) {
         let divResultIdentifier = isDoor ? '#door-results' : '#results';
-        let text = `<div data-tr_label="{{profiles_of}}">${TRANSLATIONS[globalLanguage]['profiles_of']}</div> ${barLength} <b> ${barMat}</b > <div data-tr_label="{{needed}}">necesare</div>: <b>${resultsArray.length}</b><br />`;
+        let text = `<div data-tr_label="profiles_of">${TRANSLATIONS[globalLanguage]['profiles_of']}</div> ${barLength} <b> ${barMat}</b > <div data-tr_label="needed">necesare</div>: <b>${resultsArray.length}</b><br />`;
         $(divResultIdentifier).append(text);
         text = ``;
         resultsArray.forEach((resultItem, index) => {
             text += `<hr class="result"> `
-            text += `<div data-tr_label="{{Profile}}">${TRANSLATIONS[globalLanguage]['Profile']}</div> ${index + 1}: <ul>`;
+            text += `<div data-tr_label="Profile">${TRANSLATIONS[globalLanguage]['Profile']}</div> ${index + 1}: <ul>`;
             resultItem.barResultingPieces.forEach(({
                 nrPieces,
                 lengthPieces,
@@ -873,7 +860,7 @@
                 text += `<li>${nrPieces} ${type} ${TRANSLATIONS[globalLanguage]['of']} ${lengthPieces} mm | ${profileTypeL} ---- ${profileTypeR} | ${profileCode} </li> `;
             });
             text += `</ul>`;
-            text += `<div data-tr_label="{{bar_left_of}}">${TRANSLATIONS[globalLanguage]['bar_left_of']}</div>: ${resultItem.barRest} mm<br /> <hr>`;
+            text += `<div data-tr_label="bar_left_of">${TRANSLATIONS[globalLanguage]['bar_left_of']}</div>: ${resultItem.barRest} mm<br /> <hr>`;
         });
 
         $(divResultIdentifier).append(text);
@@ -909,11 +896,11 @@
             `
              <table>
              <tr>
-                <th>Cod profil</th>
-                <th>Culoare</th>
-                <th>Inaltime</th>
-                <th>Latime</th>
-                <th>Material (dxf)</th>
+                <th data-tr_label="profile_code"></th>
+                <th data-tr_label="color"></th>
+                <th data-tr_label="profile_height"></th>
+                <th data-tr_label="profile_width"></th>
+                <th data-tr_label="material_dxf"></th>
              </tr>
              <tr>
                 <td><input class="${CLASS_NAME_PROFILE_CODE}${profileType}${inputs}" type="text" size="100" onClick="this.select();" /></td>
@@ -922,7 +909,7 @@
                 <td><input class="${CLASS_NAME_PROFILE_WIDTH}${profileType}${inputs}" type="text"  id="width" onClick="this.select();"/></td>
                 <td>
                     <input type="text" name="mat" list="mat_names" onchange="changeProfileLengthValues( ${functionInputs}, '${profileType}', this.value)" class="${CLASS_NAME_PROFILE_MAT}${profileType}${inputs} ${CLASS_NAME_PROFILE_MAT}">
-                    <datalist id="mat_names"  >${dxfOptions}</datalist>
+                    <datalist id="mat_names">${dxfOptions}</datalist>
                 </td>
             </tr>
             </table>
@@ -962,6 +949,7 @@
         $(`.${CLASS_NAME_NO}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_pieces`)[0].value;
         //length
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.CUSTOM}${inputs}`)[0].value = $(`#custom_dimension`)[0].value;
+        translatePage();
     }
 
     function exportToExcel() {
@@ -989,12 +977,12 @@
     crossorigin="anonymous"></script>
 <div class="row">
     <div class="col-5">
-        <label for="project_name" class="translate" data-tr_label="{{project_name}}">{{project_name}}</label>
+        <label for="project_name" class="translate" data-tr_label="project_name">project_name</label>
         <u><a style="cursor: pointer; color: blue" onclick="exportToExcel()" onmouseover="">Export to Excel</a></u>
         <br />
         <textarea name="Text1" cols="60" rows="5" , id="project_name"></textarea>
         <br /> <br />
-        *<i data-tr_label="{{note}}"></i>: <div data-tr_label="{{note_text}}"></div>
+        *<i data-tr_label="note"></i>: <div data-tr_label="note_text"></div>
     </div>
     <div class="col-3">
         <img src="https://raw.githubusercontent.com/andreea96/calculator/master/left_cut.png" alt="Capat stanga">
@@ -1018,11 +1006,11 @@
 <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
         <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
-            role="tab" aria-controls="home" aria-selected="true"><b data-tr_label="{{custom_profiles}}"></b></button>
+            role="tab" aria-controls="home" aria-selected="true"><b data-tr_label="custom_profiles"></b></button>
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
-            role="tab" aria-controls="profile" aria-selected="false"><b data-tr_label="{{doors}}"></b></button>
+            role="tab" aria-controls="profile" aria-selected="false"><b data-tr_label="doors"></b></button>
     </li>
 
 </ul>
@@ -1031,21 +1019,21 @@
         <br /><br />
         <!--        profile custom-->
         <button onclick="openLengthsModal(false)" id='custom_result_calculate'
-            data-tr_label="{{calculate_result}}"></button> &nbsp;
+            data-tr_label="calculate_result"></button> &nbsp;
         &nbsp;
         <br /><br />
         <table style="background-color: indianred">
             <tr>
-                <th data-tr_label="{{pieces}}"></th>
-                <th data-tr_label="{{profile_code}}"></th>
+                <th data-tr_label="pieces"></th>
+                <th data-tr_label="profile_code"></th>
                 <th> </th>
                 <th> </th>
                 <th> </th>
-                <th data-tr_label="{{dimension}}"></th>
-                <th data-tr_label="{{color}}"></th>
-                <th data-tr_label="{{profile_height}}"></th>
-                <th data-tr_label="{{profile_width}}"></th>
-                <th data-tr_label="{{material_dxf}}"></th>
+                <th data-tr_label="dimension"></th>
+                <th data-tr_label="color"></th>
+                <th data-tr_label="profile_height"></th>
+                <th data-tr_label="profile_width"></th>
+                <th data-tr_label="material_dxf"></th>
                 <th> </th>
             </tr>
             <tr>
@@ -1087,7 +1075,7 @@
                         <option value="SKY FARA CAPAC.dxf">SKY FARA CAPAC.dxf</option>
                     </datalist>
                 </td>
-                <td><button name="add_custom_pieces" onclick="addInput()" data-tr_label="{{add_pieces}}"></button>
+                <td><button name="add_custom_pieces" onclick="addInput()" data-tr_label="add_pieces"></button>
                 </td>
             </tr>
             <tr>
@@ -1113,17 +1101,17 @@
     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
         <br />
         <!--        profile usi-->
-        <button onclick="openLengthsModal()" data-tr_label="{{calculate_result}}"></button>
+        <button onclick="openLengthsModal()" data-tr_label="calculate_result"></button>
         <br /> <br />
         <table style="background-color: indianred">
             <tr>
-                <th data-tr_label="{{pieces}}"></th>
-                <th data-tr_label="{{door_code}}">Cod usa</th>
-                <th data-tr_label="{{color}}">Culoare</th>
-                <th data-tr_label="{{door_width}}">Latime usa</th>
-                <th data-tr_label="{{door_height}}">Inaltime usa</th>
-                <th data-tr_label="{{door_jamb}}">Toc</th>
-                <th data-tr_label="{{door_sash}}">Cercevea</th>
+                <th data-tr_label="pieces"></th>
+                <th data-tr_label="door_code">Cod usa</th>
+                <th data-tr_label="color">Culoare</th>
+                <th data-tr_label="door_width">Latime usa</th>
+                <th data-tr_label="door_height">Inaltime usa</th>
+                <th data-tr_label="door_jamb">Toc</th>
+                <th data-tr_label="door_sash">Cercevea</th>
             </tr>
             <tr>
                 <td><input id="door_pieces" type="text" value="1" onClick="this.select();" />
@@ -1136,18 +1124,18 @@
                 <td><select id="door_sash_selection"></select></td>
                 <td>
                     <button class=" dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false" data-tr_label="{{add_door}}"></button>
+                        aria-haspopup="true" aria-expanded="false" data-tr_label="add_door"></button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX)">DX --> <div
-                                data-tr_label="{{on}}"></div> <b data-tr_label="{{flooring}}"></b></a>
+                                data-tr_label="on"></div> <b data-tr_label="flooring"></b></a>
                         <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.DX, true)">DX --> <div
-                                data-tr_label="{{on}}">pe</div>
-                            <b data-tr_label="{{rug}}"></b></a>
+                                data-tr_label="on">pe</div>
+                            <b data-tr_label="rug"></b></a>
                         <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX)">SX --> <div
-                                data-tr_label="{{on}}"></div>
-                            <b data-tr_label="{{flooring}}"></b></a>
+                                data-tr_label="on"></div>
+                            <b data-tr_label="flooring"></b></a>
                         <a class="dropdown-item" href="#" onclick="addDoor(DOOR_TYPE.SX, true)">SX --> <div
-                                data-tr_label="{{on}}"></div> <b data-tr_label="{{rug}}"></b></a>
+                                data-tr_label="on"></div> <b data-tr_label="rug"></b></a>
                     </div>
                 </td>
             </tr>
@@ -1203,8 +1191,10 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel" data-tr_label="{{bars_lengths}}">Lungimi bari</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title" id="exampleModalLabel" data-tr_label="bars_lengths">
+                    <div data-tr_label="bars_lengths"></div>
+                </h5>
+                <button type=" button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1213,7 +1203,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="calculateDoorResult(false)"
-                    data-tr_label="{{calculate_result}}">
+                    data-tr_label="calculate_result">
                 </button>
             </div>
         </div>
@@ -1233,7 +1223,8 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="calculateDoorResult()">Calculeaza rezultat
+                <button type="button" class="btn btn-primary" onclick="calculateDoorResult()">
+                    <div data-tr_label="calculate_result"></div>
                 </button>
             </div>
         </div>
