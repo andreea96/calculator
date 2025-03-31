@@ -122,7 +122,8 @@
         DXF_KWI: 'KWI.dxf',
         DXF_SKY_CU_CAPAC: 'SKY CU CAPAC.dxf',
         DXF_SKY_FARA_CAPAC: 'SKY FARA CAPAC.dxf',
-
+        DXF_2VL: 'Profil 2 Vision L.dxf',
+        DXF_ECO_CERCEVEA: 'Cercevea_Omifa_ECO.dxf',
     };
     const DOOR_TYPE = {
         SX: 'SX',
@@ -135,7 +136,8 @@
 
     const DOORSASHS = [
         PROFILE_MATERIALS.DXF_2V_BIGCERCEVEA,
-        NO_SASH
+        NO_SASH,
+        PROFILE_MATERIALS.DXF_ECO_CERCEVEA,
     ];
 
     const INPUT_TYPE = {
@@ -190,7 +192,7 @@
     function changeProfileLengthValues(i, type, option) {
         const heightIdentifier = i === -1 ? 'custom_height' : `${CLASS_NAME_PROFILE_HEIGHT}${type}${i}`;
         const widthIdentifier = i === -1 ? 'custom_width' : `${CLASS_NAME_PROFILE_WIDTH}${type}${i}`;
-
+        // le inverseaza pt excel
         switch (option) {
             case PROFILE_MATERIALS.DXF_LUCE:
                 $(`.${heightIdentifier}`)[0].value = 60;
@@ -212,6 +214,10 @@
                 $(`.${heightIdentifier}`)[0].value = 35;
                 $(`.${widthIdentifier}`)[0].value = 100;
                 break;
+            case PROFILE_MATERIALS.DXF_2VL:
+                $(`.${heightIdentifier}`)[0].value = 100;
+                $(`.${widthIdentifier}`)[0].value = 35;
+                break;
             case PROFILE_MATERIALS.DXF_2V_BIGCERCEVEA:
                 $(`.${heightIdentifier}`)[0].value = 62.9;
                 $(`.${widthIdentifier}`)[0].value = 47.6;
@@ -229,6 +235,10 @@
             case PROFILE_MATERIALS.DXF_SINGLE_OMIFA_U:
                 $(`.${heightIdentifier}`)[0].value = 24;
                 $(`.${widthIdentifier}`)[0].value = 35;
+                break;
+            case PROFILE_MATERIALS.DXF_ECO_CERCEVEA:
+                $(`.${heightIdentifier}`)[0].value = 75;
+                $(`.${widthIdentifier}`)[0].value = 41;
                 break;
         }
     }
@@ -495,13 +505,13 @@
         const doorSashSelectionValue = $('#door_sash_selection')[0].value;
         const hasSash = doorSashSelectionValue !== NO_SASH;
         //add profiles
-        addDoorJamb(doorType, isOnRug, doorJambSelectionValue, doorHeight, doorWidth, doorCode, doorColor, doorPieces, hasSash);
+        addDoorJamb(doorType, isOnRug, doorJambSelectionValue, doorHeight, doorWidth, doorCode, doorColor, doorPieces);
         if (hasSash) {
-            addSash(doorType, isOnRug, doorWidth, doorHeight, doorCode, doorColor, doorPieces);
+            addSash(doorType, isOnRug, doorSashSelectionValue, doorWidth, doorHeight, doorCode, doorColor, doorPieces);
         }
     }
 
-    function addSash(doorType = DOOR_TYPE.DX, isOnRug = false, doorWidth, doorHeight, doorCode, doorColor, amount = 1) {
+    function addSash(doorType = DOOR_TYPE.DX, isOnRug = false, profileDXF, doorWidth, doorHeight, doorCode, doorColor, amount = 1) {
         const sashParts = [
             {
                 name: doorType === DOOR_TYPE.DX ? 'iala' : 'balama',
@@ -523,8 +533,8 @@
             $("#door-pieces").append(profileHtml);
             //precompletion
             //select
-            $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${profileI}`)[0].value = PROFILE_MATERIALS.DXF_2V_BIGCERCEVEA;
-            changeProfileLengthValues(profileI, INPUT_TYPE.DOOR, PROFILE_MATERIALS.DXF_2V_BIGCERCEVEA);
+            $(`.${CLASS_NAME_PROFILE_MAT}${INPUT_TYPE.DOOR}${profileI} `)[0].value = profileDXF;
+            changeProfileLengthValues(profileI, INPUT_TYPE.DOOR, profileDXF);
             //color
             $(`.${CLASS_NAME_PROFILE_COLOR}${INPUT_TYPE.DOOR}${profileI}`)[0].value = doorColor;
             //left angle
@@ -735,6 +745,8 @@
             <option value="KWI.dxf">KWI.dxf</option>
             <option value="SKY CU CAPAC.dxf">SKY CU CAPAC.dxf</option>
             <option value="SKY FARA CAPAC.dxf">SKY FARA CAPAC.dxf</option>
+            <option value="Cercevea_Omifa_ECO.dxf">Cercevea_Omifa_ECO.dxf</option>
+            <option value="Profil 2 Vision L.dxf">Profil 2 Vision L.dxf</option>
         `;
         var profileTypeOptions =
             `<option value="90">90</option>
@@ -897,8 +909,8 @@
                     </select></td>
                 <td><input id="custom_dimension" type="number" onClick="this.select();" /></td>
                 <td><input id="custom_color" type="text" value="anodizat" onClick="this.select();" /></td>
-                <td><input id="custom_height" class="custom_width" type="text" onClick="this.select();" /></td>
-                <td><input id="custom_width" class="custom_height" type="text" onClick="this.select();" /></td>
+                <td><input id="custom_height" class="custom_height" type="text" onClick="this.select();" /></td>
+                <td><input id="custom_width" class="custom_width" type="text" onClick="this.select();" /></td>
                 <td><input type="text" name="mat" list="mat_names"
                         onchange="changeProfileLengthValues(-1,'custom', this.value)" class="custom_mat">
                     <datalist id="mat_names">
@@ -917,6 +929,8 @@
                         <option value="KWI.dxf">KWI.dxf</option>
                         <option value="SKY CU CAPAC.dxf">SKY CU CAPAC.dxf</option>
                         <option value="SKY FARA CAPAC.dxf">SKY FARA CAPAC.dxf</option>
+                        <option value="Cercevea_Omifa_ECO.dxf">Cercevea_Omifa_ECO.dxf</option>
+                        <option value="Profil 2 Vision L.dxf">Profil 2 Vision L.dxf</option>
                     </datalist>
                 </td>
                 <td><button name="add_custom_pieces" onclick="addInput()">Adauga bucati dorite</button></td>
