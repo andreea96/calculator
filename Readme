@@ -2,3 +2,5 @@ docker run -d -p 8001:80 -v /var/www/calculator/html/:/usr/share/nginx/html/ ngi
 
 #run tests
 npx nightwatch custom_cuts_tests.js --env chrome
+
+Nota: master branch is the last file received from Bratu, single source of truth, last updated. Missing translations
