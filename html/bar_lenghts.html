@@ -708,8 +708,8 @@
             //right angle
             $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${profileI} `)[0].value = 45;
             //name
-            const code = `${doorType}_cercevea_${name}_${doorCode} `;
-            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI} `)[0].value = code;
+            const code = `${doorType}_cercevea_${name}${this.getLengthCode(name, isOnRug, true, true)}_${doorCode}`;
+            $(`.${CLASS_NAME_PROFILE_CODE}${INPUT_TYPE.DOOR}${profileI}`)[0].value = code;
             doorCodes[code] = doorCode;
             //length
             $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${profileI} `)[0].value = length;
@@ -759,9 +759,11 @@
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${supPartI} `)[0].value = 45;
         $(`.${CLASS_NAME_PROFILE_TYPE_RIGHT}${INPUT_TYPE.DOOR}${hingeI} `)[0].value = 45;
         // doorCodes
-        const code1 = `${doorType}_${doorType === DOOR_TYPE.DX ? 'iala' : 'balama'}_${doorCode} `;
-        const code2 = `${doorType}_partea_superioara_${doorCode} `;
-        const code3 = `${doorType}_${doorType === DOOR_TYPE.DX ? 'balama' : 'iala'}_${doorCode} `;
+        const lockCode = `iala${this.getLengthCode('iala', isOnRug, hasSash, false)}`;
+        const hingeCode = `balama${this.getLengthCode('balama', isOnRug, hasSash, false)}`;
+        const code1 = `${doorType}_${doorType === DOOR_TYPE.DX ? lockCode : hingeCode}_${doorCode}`;
+        const code2 = `${doorType}_partea_superioara_${doorCode}`;
+        const code3 = `${doorType}_${doorType === DOOR_TYPE.DX ? hingeCode : lockCode}_${doorCode}`;
         doorCodes[code1] = doorCode;
         doorCodes[code2] = doorCode;
         doorCodes[code3] = doorCode;
@@ -801,6 +803,30 @@
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${lockI} `)[0].disabled = true;
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${supPartI} `)[0].disabled = true;
         $(`.${CLASS_NAME_LENGTH}${INPUT_TYPE.DOOR}${hingeI} `)[0].disabled = true;
+    }
+
+    function getLengthCode(name, isOnRug, hasSash, isSash) { //name: 'balama' | 'iala'
+        if (!hasSash) {
+            if (name === 'iala') {
+                return '_1084mm';
+            }
+            if (name === 'balama') {
+                return '';
+            }
+        }
+        if (hasSash) {
+            if (name === 'balama' && !isSash) {
+                return isOnRug ? '_310mm' : '_317mm';
+            }
+            if (name === 'iala' && isSash) {
+                return '';
+            }
+            if (name === 'iala' && !isSash) {
+                return isOnRug ? '_1076mm' : '_1083mm';
+            }
+        }
+
+        return '';
     }
 
     function doorjambValueChange(e) {
